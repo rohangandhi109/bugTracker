@@ -1,29 +1,11 @@
------Views-----
-1. Login page : (auth0)
-2. Dashboard : (authorization for admin and project manager)
-3. Form to submit a ticket  (submitter and Developer)
-
------Roles-----
-1. submitter
-2. Developer
-3. Project manager
-4. Admin
-
----Details---
-1. Login
-    admin will assign a user
-    username
-    password
-    Forgot password -> redirect to new page
-    Demo user
-
-2. Admin
+---Roles---
+1. Admin
     1. User management : add user, assign/change Roles, change user info
     2. Project management: create project, list of existing projects, manage users in projects,
         details of a specific project: users assigned, list of tickets(onClick event to show ticket details) 
     3. Tickets: change a ticket
 
-3. Project manager
+2. Project manager
     1. Dashboard: 
         all projects:
             line graph : projects vs open tickets over a period of time (check boxes to filter porjects)
@@ -35,11 +17,11 @@
         list of assigned and unassigned tickets
     3. notification of unassigned tickets
 
-4. Developer
+3. Developer
     1. Tickets of self project
         list of assigned and unassigned tickets
         Raise a ticket
     2. notification of unassigned/assigned tickets
 
-5. submitter
+4. submitter
     Raise a ticket
