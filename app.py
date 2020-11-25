@@ -5,33 +5,29 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/test"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:postgres@localhost:5432/bug"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-from models import Result
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Headers',
+                             'Content-Type, Authorization')
+    response.headers.add('Access-Control-Allow-Methods',
+                            'GET, PATCH, POST, DELETE, OPTIONS')
+    return response
 
+from models.TicketModel import Ticket
+from controllers import submitter
 
-@app.route('/')
-def index():
-    try:
-        result = Result("rohan",123)
-        db.session.add(result)
-        db.session.commit()
-    except:
-        error = True
-        db.session.rollback()
-        print(sys.exc_info())
-    finally:
-        db.session.close()
-    return 'hello world'
+@app.errorhandler(500)
+def error_500(error):
+    return jsonify({
+    'success': False,
+    'error': 500,
+    'message': 'Server side error'
+    }), 500
 
-@app.route('/temp')
-def hello():
-    temp = Result.query.all()
-    temp = [tmp.format() for tmp in temp]
-
-    return jsonify(temp),200
 
 
 if __name__ == '__main__':
