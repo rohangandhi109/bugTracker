@@ -1,6 +1,6 @@
 import sys
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify,render_template
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -19,6 +19,10 @@ def after_request(response):
 
 from models.TicketModel import Ticket
 from controllers import submitter
+
+@app.route('/')
+def start():
+    return render_template('TicketForm.html')
 
 @app.errorhandler(500)
 def error_500(error):
