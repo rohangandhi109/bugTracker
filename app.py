@@ -1,7 +1,12 @@
 import sys
 
-from flask import Flask, jsonify,render_template
+from flask import Flask, redirect, url_for, jsonify, render_template
 from flask_sqlalchemy import SQLAlchemy
+
+AUTH0_DOMAIN = 'dev-9oonecyt.us.auth0.com'
+API_AUDIENCE = 'bugTracker'
+AUTH0_CLIENT_ID = '2Qo9NMZBSqfdIvmx5Oeh2v0AGTKL61bB'
+AUTH0_CALLBACK_URL = 'http://127.0.0.1:5000/tickets'
 
 app = Flask(__name__)
 
@@ -17,12 +22,24 @@ def after_request(response):
                             'GET, PATCH, POST, DELETE, OPTIONS')
     return response
 
-from models.TicketModel import Ticket
-from controllers import submitter
+@app.route("/", methods=["GET"])
+def generate_auth_url():
+    
+    url = f'https://{AUTH0_DOMAIN}/authorize' \
+            f'?audience={API_AUDIENCE}' \
+            f'&response_type=token&client_id=' \
+            f'{AUTH0_CLIENT_ID}&redirect_uri=' \
+            f'{AUTH0_CALLBACK_URL}'
 
-@app.route('/')
-def start():
-    return render_template('TicketForm.html')
+    return redirect(url)
+
+@app.route("/login")
+def login():
+    return render_template('login.html')
+
+from models.TicketModel import Ticket
+from controllers import User
+
 
 @app.errorhandler(500)
 def error_500(error):
@@ -31,8 +48,6 @@ def error_500(error):
     'error': 500,
     'message': 'Server side error'
     }), 500
-
-
 
 if __name__ == '__main__':
     app.run()
