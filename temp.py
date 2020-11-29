@@ -1,36 +1,46 @@
-import json
-from jose import jwt
-from urllib.request import urlopen
+from functools import wraps
+import constants
+from flask import Flask, render_template, session, redirect
+from os import environ as env
+from authlib.integrations.flask_client import OAuth
+from dotenv import load_dotenv, find_dotenv
 
-token = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6ImctT2g2c3FGZ21DcERMc0NJN21IZyJ9.eyJpc3MiOiJodHRwczovL2Rldi05b29uZWN5dC51cy5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWZiZjMwMDgxYTc1NTAwMDc2MDQ2MDk2IiwiYXVkIjoiYnVnVHJhY2tlciIsImlhdCI6MTYwNjM2NjEyNywiZXhwIjoxNjA2MzczMzI3LCJhenAiOiIyUW85Tk1aQlNxZmRJdm14NU9laDJ2MEFHVEtMNjFiQiIsInNjb3BlIjoiIiwicGVybWlzc2lvbnMiOltdfQ.bVlAN0G7XorHHvtqLS9nh2M8uNRjOQQN_4lzgWw-0LDm3znYy7CsF7QYPzMoj2dg7E_nesbpKbHfCI_dUOjREmMDnRN3Jqg-GN2IhtM2jfW8rFbu8dT3wzgrJ6BmLtdZfstGbL3H_GoH3-WoQZ7Cvk59WgwXv5N46n8aHGTYDWgKOj89kPorRYtQde91CBu9sON0jCSzuv0231WS5H7JWb96FrYX2HVfOFYx_2qtbDvGOiHl-TJimJT06NHGRCsL074UcOorBmMyKwT61tCJiY1iZlOaj_FNGl26l3rH2bUyJocDdb4cGwxO8E8Ko4Y9C4Gbt-EQBSZgFF9dl-XvnA'
 
-ALGORITHMS=['RS256']
-API_AUDIENCE = 'bugTracker'
+AUTH0_CALLBACK_URL = 'http://127.0.0.1:5000/callback'
+AUTH0_CLIENT_ID = '2Qo9NMZBSqfdIvmx5Oeh2v0AGTKL61bB'
+AUTH0_CLIENT_SECRET = 'YoMyvqDqWOP9IAWSv1HwQ_vjnK5wK_tJFDhRd0X39vkOy_Vfq7O78G84BWduc7nJ'
 AUTH0_DOMAIN = 'dev-9oonecyt.us.auth0.com'
+AUTH0_BASE_URL = 'https://' + AUTH0_DOMAIN
+AUTH0_AUDIENCE = 'bugTracker'
+
+app = Flask(__name__,  static_url_path='/static')
+app.secret_key = 'constants.SECRET_KEY'
+
+oauth = OAuth(app)
+
+auth0 = oauth.register(
+    'auth0',
+    client_id=AUTH0_CLIENT_ID,
+    client_secret=AUTH0_CLIENT_SECRET,
+    api_base_url=AUTH0_BASE_URL,
+    access_token_url=AUTH0_BASE_URL + '/oauth/token',
+    authorize_url=AUTH0_BASE_URL + '/authorize',
+    client_kwargs={
+        'scope': 'openid profile email',
+    },
+)
+
+@app.route('/tickets')
+def callback_handling():
+    auth0.authorize_access_token()
+    resp = auth0.get('userinfo')
+    userinfo = resp.json()
+
+    print(userinfo)
+    return "user"
 
 
-jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
-jwks = json.loads(jsonurl.read())
-unverified_header = jwt.get_unverified_header(token)
-rsa_key = {}
 
-for key in jwks['keys']:
-    if key['kid'] == unverified_header['kid']:
-        rsa_key = {
-            'kty': key['kty'],
-            'kid': key['kid'],
-            'use': key['use'],
-            'n': key['n'],
-            'e': key['e']
-        }
-
-
-payload = jwt.decode(
-                token,
-                rsa_key,
-                algorithms=ALGORITHMS,
-                audience=API_AUDIENCE,
-                issuer='https://' + AUTH0_DOMAIN + '/'
-            )
-
-print(payload)
+@app.route('/login')
+def login():
+    return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL, audience=AUTH0_AUDIENCE)
