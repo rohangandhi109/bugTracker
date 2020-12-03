@@ -1,10 +1,10 @@
 from app import app
 from models.TicketModel import Ticket
-from flask import abort, request,render_template,redirect,url_for,session, jsonify
-import sys, constants
+from flask import abort, request,render_template,redirect,url_for,session
+import sys
 from datetime import date
 
-@app.route('/tickets')
+@app.route('/my/tickets')
 def get_tickets():
     userInfo = session.get('userInfo', 'not set')
     ticket = Ticket.query.filter_by(submitter_email='bob@gmail.com').all()

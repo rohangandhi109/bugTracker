@@ -1,5 +1,4 @@
 from app import db
-import sys
 
 class Ticket(db.Model):
     
@@ -28,7 +27,7 @@ class Ticket(db.Model):
         self.t_close_date = t_close_date
        
     def __repr__(self):
-        return '<id {}>'.format(self.id)
+        return '<id {}>'.format(self.t_id)
 
     def format(self):
         return {
