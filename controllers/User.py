@@ -3,12 +3,10 @@ from models.TicketModel import Ticket
 from flask import abort, request,render_template,redirect,url_for,session, jsonify
 import sys, constants
 from datetime import date
-from auth import *
 
 @app.route('/tickets')
 def get_tickets():
     userInfo = session.get('userInfo', 'not set')
-    print(userInfo)
     ticket = Ticket.query.filter_by(submitter_email='bob@gmail.com').all()
     ticket = [tick.format() for tick in ticket]
     data={
@@ -22,7 +20,6 @@ def get_ticketForm():
     return render_template('ticket-form.html')
 
 @app.route('/ticket-form', methods=['POST'])
-@requires_auth('create:Ticket')
 def create_ticket():
     userInfo = session.get('userInfo')
     t_title = request.form.get('t_title', '')
