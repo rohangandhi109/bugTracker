@@ -1,0 +1,343 @@
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 12.3
+-- Dumped by pg_dump version 12.3
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: alembic_version; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.alembic_version (
+    version_num character varying(32) NOT NULL
+);
+
+
+ALTER TABLE public.alembic_version OWNER TO postgres;
+
+--
+-- Name: emp; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.emp (
+    emp_id integer NOT NULL,
+    emp_email character varying,
+    emp_name character varying,
+    emp_password character varying,
+    emp_role character varying,
+    update_date character varying
+);
+
+
+ALTER TABLE public.emp OWNER TO postgres;
+
+--
+-- Name: emp_emp_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.emp_emp_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.emp_emp_id_seq OWNER TO postgres;
+
+--
+-- Name: emp_emp_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.emp_emp_id_seq OWNED BY public.emp.emp_id;
+
+
+--
+-- Name: map_emp_proj; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.map_emp_proj (
+    map_id integer NOT NULL,
+    p_id integer,
+    emp_id integer,
+    emp_role character varying,
+    emp_assign_date character varying,
+    emp_end_date character varying
+);
+
+
+ALTER TABLE public.map_emp_proj OWNER TO postgres;
+
+--
+-- Name: map_emp_proj_map_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.map_emp_proj_map_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.map_emp_proj_map_id_seq OWNER TO postgres;
+
+--
+-- Name: map_emp_proj_map_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.map_emp_proj_map_id_seq OWNED BY public.map_emp_proj.map_id;
+
+
+--
+-- Name: project; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.project (
+    p_id integer NOT NULL,
+    p_name character varying(20),
+    p_desc character varying(100),
+    p_start_date character varying,
+    p_end_date character varying
+);
+
+
+ALTER TABLE public.project OWNER TO postgres;
+
+--
+-- Name: project_p_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.project_p_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.project_p_id_seq OWNER TO postgres;
+
+--
+-- Name: project_p_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.project_p_id_seq OWNED BY public.project.p_id;
+
+
+--
+-- Name: ticket; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.ticket (
+    t_id integer NOT NULL,
+    t_title character varying(20),
+    t_desc character varying(100),
+    emp_id integer,
+    submitter_email character varying,
+    p_id integer,
+    t_priority character varying,
+    t_status character varying,
+    t_type character varying,
+    t_create_date character varying,
+    t_close_date character varying
+);
+
+
+ALTER TABLE public.ticket OWNER TO postgres;
+
+--
+-- Name: ticket_t_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.ticket_t_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.ticket_t_id_seq OWNER TO postgres;
+
+--
+-- Name: ticket_t_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE public.ticket_t_id_seq OWNED BY public.ticket.t_id;
+
+
+--
+-- Name: emp emp_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.emp ALTER COLUMN emp_id SET DEFAULT nextval('public.emp_emp_id_seq'::regclass);
+
+
+--
+-- Name: map_emp_proj map_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.map_emp_proj ALTER COLUMN map_id SET DEFAULT nextval('public.map_emp_proj_map_id_seq'::regclass);
+
+
+--
+-- Name: project p_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.project ALTER COLUMN p_id SET DEFAULT nextval('public.project_p_id_seq'::regclass);
+
+
+--
+-- Name: ticket t_id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ticket ALTER COLUMN t_id SET DEFAULT nextval('public.ticket_t_id_seq'::regclass);
+
+
+--
+-- Data for Name: alembic_version; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.alembic_version (version_num) FROM stdin;
+da7c8bd5599b
+\.
+
+
+--
+-- Data for Name: emp; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.emp (emp_id, emp_email, emp_name, emp_password, emp_role, update_date) FROM stdin;
+1	bob@gmail.com	bob	bugTracker123	user	N/A
+2	alice@gmail.com	alice	alice	dev	N/A
+\.
+
+
+--
+-- Data for Name: map_emp_proj; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.map_emp_proj (map_id, p_id, emp_id, emp_role, emp_assign_date, emp_end_date) FROM stdin;
+1	1	1	user	28/11/2020	N/A
+2	2	2	dev	28/11/2020	N/A
+3	3	2	dev	12/12/2020	N/A
+\.
+
+
+--
+-- Data for Name: project; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.project (p_id, p_name, p_desc, p_start_date, p_end_date) FROM stdin;
+1	proj1	desc1	28/11/2020	N/A
+2	proj2	desc2	30/11/2020	N/A
+3	proj3	desc3	2/12/2020	N/A
+\.
+
+
+--
+-- Data for Name: ticket; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.ticket (t_id, t_title, t_desc, emp_id, submitter_email, p_id, t_priority, t_status, t_type, t_create_date, t_close_date) FROM stdin;
+1	Ticket1	desc1	2	alice@gmail.com	1	High	open	sds	03/12/2020	N/A
+2	Ticket2	desc 2	1	bob@gmail.com	2	Medium	open	bug	03/12/2020	N/A
+3	Ticket3	desc254	1	bob@gmail.com	1	High	open	hsbdn	03/12/2020	N/A
+4	ticket4	de2	2	alice@gmail.com	3	High	open	sds	04/12/2020	N/A
+5	Ticket5	dsjdnsj	2	alice@gmail.com	3	Medium	open	sds	04/12/2020	N/A
+\.
+
+
+--
+-- Name: emp_emp_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.emp_emp_id_seq', 1, false);
+
+
+--
+-- Name: map_emp_proj_map_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.map_emp_proj_map_id_seq', 1, false);
+
+
+--
+-- Name: project_p_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.project_p_id_seq', 1, false);
+
+
+--
+-- Name: ticket_t_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.ticket_t_id_seq', 5, true);
+
+
+--
+-- Name: alembic_version alembic_version_pkc; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.alembic_version
+    ADD CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num);
+
+
+--
+-- Name: emp emp_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.emp
+    ADD CONSTRAINT emp_pkey PRIMARY KEY (emp_id);
+
+
+--
+-- Name: map_emp_proj map_emp_proj_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.map_emp_proj
+    ADD CONSTRAINT map_emp_proj_pkey PRIMARY KEY (map_id);
+
+
+--
+-- Name: project project_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.project
+    ADD CONSTRAINT project_pkey PRIMARY KEY (p_id);
+
+
+--
+-- Name: ticket ticket_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.ticket
+    ADD CONSTRAINT ticket_pkey PRIMARY KEY (t_id);
+
+
+--
+-- PostgreSQL database dump complete
+--
+

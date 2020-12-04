@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from authlib.integrations.flask_client import OAuth
 from six.moves.urllib.parse import urlencode
 from info import *
-from auth import verify_decode_jwt
+
 
 app = Flask(__name__)
 app.secret_key = "something"
@@ -36,11 +36,12 @@ auth0 = oauth.register(
     },
 )
 
+
 from models.TicketModel import Ticket
 from models.EmpModel import Emp
 from models.Map_emp_proj import Map_emp_proj
 from models.ProjectModel import Project
-from controllers import user
+from controllers import user, developer,ticket
 
 @app.route('/')
 def login():
@@ -49,12 +50,15 @@ def login():
 
 @app.route('/callback')
 def callback_handling():
-    auth = auth0.authorize_access_token()
-    payload = verify_decode_jwt(auth['access_token'])
-    print(payload)
+    auth0.authorize_access_token()
     resp = auth0.get('userinfo')
     userinfo = resp.json()
-    session['userInfo'] = userinfo
+    role = Emp.query.with_entities(Emp.emp_role).filter_by(emp_email=userinfo['email']).first()
+    session['userProfile'] = {
+        'email': userinfo['email'],
+        'role': role[0],
+        'name':userinfo['nickname']
+    }
     
     return redirect('/my/tickets')
 
