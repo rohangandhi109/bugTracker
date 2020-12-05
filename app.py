@@ -59,8 +59,10 @@ def callback_handling():
         'role': role[0],
         'name':userinfo['nickname']
     }
-    
-    return redirect('/my/tickets')
+    if role[0] == 'user':
+        return redirect('/my/tickets')
+    elif role[0] == 'dev':
+        return redirect('/dev/tickets')
 
 @app.route('/logout')
 def logout():

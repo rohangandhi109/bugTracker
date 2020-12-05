@@ -34,6 +34,6 @@ def create_ticket():
         abort(500)
     if userInfo['role'] == 'dev':
         return redirect(url_for('get_project_tickets'))
-    else:
+    elif userInfo['role'] == 'user':
         return redirect(url_for('get_tickets'))
     
