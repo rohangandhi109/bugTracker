@@ -1,19 +1,19 @@
 from app import db
 
-class Ticket_detail(db.Model):
+class Ticket_history(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     t_id = db.Column(db.Integer)
-    emp_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer)
     t_status =  db.Column(db.String)
     t_update_date = db.Column(db.String)
-    comment = db.Column(db.String)
+    priority = db.Column(db.String)
     
-    def __init__(self, t_id, emp_id, t_status, t_update_date, comment):
+    def __init__(self, t_id, user_id, t_status, t_update_date, priority):
         self.t_id = t_id
-        self.emp_id = emp_id
+        self.user_id = user_id
         self.t_status = t_status
         self.t_update_date = t_update_date
-        self.comment = comment
+        self.priority = priority
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
@@ -21,9 +21,9 @@ class Ticket_detail(db.Model):
     def format(self):
         return {
         'id' : self.t_id,
-        'emp_id' : self.emp_id,
+        'user_id' : self.user_id,
         'status' : self.t_status,
-        'comment' : self.comment,
+        'priority' : self.comment,
         'update_date' : self.t_update_date
         }
     

@@ -26,9 +26,16 @@
 
                     {% include '/includes/ticketTable.html' %}
 
+                    <form action="/add-comment" method="POST">
+                        <label for="comment">Add Comment</label>
+                        <br>
+                        <input id="comment" type="text" name="comment"/>
+                    </form>
+                    <br>
+
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Details</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">History</h6>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -46,7 +53,7 @@
                                         {% for d in data.detail %}
                                         <tr>
                                             <td>{{ d.id }}</td>
-                                            <td>{{ d.emp_id }}</td>
+                                            <td>{{ d.user_id }}</td>
                                             <td>{{ d.status }}</td>
                                             <td>{{ d.update_date }}</td>
                                             <td>{{ d.comment }}</td>
@@ -57,8 +64,6 @@
                             </div>
                         </div>
                     </div>
-
-
                 </div>
                 <!-- /.container-fluid -->
 

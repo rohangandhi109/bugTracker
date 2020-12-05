@@ -36,12 +36,12 @@ auth0 = oauth.register(
     },
 )
 
-
 from models.Ticket import Ticket
-from models.Emp import Emp
-from models.Map_emp_proj import Map_emp_proj
+from models.Users import Users
+from models.Map_user_proj import Map_user_proj
 from models.Project import Project
-from models.Ticket_detail import Ticket_detail
+from models.Ticket_history import Ticket_history
+from models.Comment import Comment
 from controllers import user, developer,ticket
 
 @app.route('/')
@@ -54,7 +54,7 @@ def callback_handling():
     auth0.authorize_access_token()
     resp = auth0.get('userinfo')
     userinfo = resp.json()
-    role = Emp.query.with_entities(Emp.emp_role).filter_by(emp_email=userinfo['email']).first()
+    role = Users.query.with_entities(Users.user_role).filter_by(user_email=userinfo['email']).first()
     session['userProfile'] = {
         'email': userinfo['email'],
         'role': role[0],
