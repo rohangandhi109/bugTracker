@@ -37,10 +37,11 @@ auth0 = oauth.register(
 )
 
 
-from models.TicketModel import Ticket
-from models.EmpModel import Emp
+from models.Ticket import Ticket
+from models.Emp import Emp
 from models.Map_emp_proj import Map_emp_proj
-from models.ProjectModel import Project
+from models.Project import Project
+from models.Ticket_detail import Ticket_detail
 from controllers import user, developer,ticket
 
 @app.route('/')
@@ -59,10 +60,8 @@ def callback_handling():
         'role': role[0],
         'name':userinfo['nickname']
     }
-    if role[0] == 'user':
-        return redirect('/my/tickets')
-    elif role[0] == 'dev':
-        return redirect('/dev/tickets')
+    
+    return redirect('/'+ role[0]+ '/tickets')
 
 @app.route('/logout')
 def logout():
@@ -71,6 +70,14 @@ def logout():
     return redirect(auth0.api_base_url + '/v2/logout?' + urlencode(params))
 
 
+@app.errorhandler(404)
+def error_404(error):
+    return jsonify({
+    'success': False,
+    'error': 404,
+    'message': 'Page not found'
+    }), 404
+
 @app.errorhandler(500)
 def error_500(error):
     return jsonify({
@@ -78,6 +85,14 @@ def error_500(error):
     'error': 500,
     'message': 'Server side error'
     }), 500
+
+@app.errorhandler(401)
+def error_401(error):
+    return jsonify({
+    'success': False,
+    'error': 401,
+    'message': 'unauthorized'
+    }), 401
 
 if __name__ == '__main__':
     app.run()

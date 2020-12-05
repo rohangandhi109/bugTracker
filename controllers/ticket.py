@@ -1,16 +1,21 @@
-from app import app
-from models.TicketModel import Ticket
-from models.ProjectModel import Project
-from models.EmpModel import Emp
+from app import app,db
+from models.Ticket import Ticket
+from models.Project import Project
+from models.Emp import Emp
+from models.Ticket_detail import Ticket_detail
 from flask import abort, request,render_template,redirect,url_for,session
 import sys
 from datetime import date
+from sqlalchemy import text
 
 @app.route('/ticket-form', methods=['GET'])
 def get_ticketForm():
     project  = Project.query.all()
     project = [tick.format() for tick in project]
-    return render_template('ticket-form.html',project=project)
+    data = {
+        'project':project,
+    }
+    return render_template('ticket-form.html',data=data)
 
 @app.route('/ticket-form', methods=['POST'])
 def create_ticket():
@@ -37,3 +42,31 @@ def create_ticket():
     elif userInfo['role'] == 'user':
         return redirect(url_for('get_tickets'))
     
+@app.route('/ticket-details/<int:ticket_id>')
+def get_ticket_details(ticket_id):
+    userInfo = session.get('userProfile')
+    ticket = Ticket.query.get(ticket_id)
+    if not ticket:
+        abort(404)
+    sql = text("""SELECT tick_detail.t_id, 
+                filter.emp_name as emp_id, 
+                tick_detail.t_status, 
+                tick_detail.t_update_date, 
+                tick_detail.comment 
+                FROM   ticket_detail tick_detail 
+                INNER JOIN (SELECT emp.emp_name, tick.t_id FROM emp emp 
+                INNER JOIN (SELECT emp_id, t_id FROM ticket WHERE  t_id = '"""+ str(ticket_id) +"""') tick 
+                ON emp.emp_id = tick.emp_id) filter 
+                ON tick_detail.t_id = filter.t_id  """)
+    detail = db.session.execute(sql)
+    detail = [row for row in detail]
+    detail = [Ticket_detail.format(row) for row in detail]
+    
+    data = {
+        'ticket': [ticket.format()],
+        'detail': detail,
+        'role': userInfo['role'],
+        'user_name': userInfo['name'],
+        'page':'ticket_detail'
+    }
+    return render_template('ticket-detail.html',data=data)

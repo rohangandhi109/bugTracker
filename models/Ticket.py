@@ -1,4 +1,6 @@
 from app import db
+from models.Project import Project
+from sqlalchemy.orm import load_only
 
 class Ticket(db.Model):
     

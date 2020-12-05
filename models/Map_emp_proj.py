@@ -18,7 +18,7 @@ class Map_emp_proj(db.Model):
         self.emp_end_date = emp_end_date
        
     def __repr__(self):
-        return '<id {}>'.format(self.p_id)
+        return '<id {}>'.format(self.map_id)
 
     def format(self):
         return {

@@ -1,8 +1,8 @@
 from app import app,db
-from models.TicketModel import Ticket
-from models.ProjectModel import Project
+from models.Ticket import Ticket
+from models.Project import Project
 from models.Map_emp_proj import Map_emp_proj
-from models.EmpModel import Emp
+from models.Emp import Emp
 from flask import abort, request,render_template,redirect,url_for,session, jsonify
 from datetime import date
 from sqlalchemy import text
@@ -12,6 +12,8 @@ from auth import *
 def get_project_tickets():
     userInfo = session.get('userProfile', 'not set')
     dev_email = userInfo['email']
+    if userInfo['role'] != 'dev':
+        abort(401)
     sql = text("""SELECT tick.t_id, tick.t_title, tick.t_desc, tick.emp_id, tick.submitter_email, tick.p_id, tick.t_priority, tick.t_status, tick.t_type, tick.t_create_date, tick.t_close_date
                 FROM   ticket tick 
                 INNER JOIN (SELECT map.p_id
@@ -24,6 +26,8 @@ def get_project_tickets():
     ticket = [Ticket.format(row) for row in result]
     data={
         'ticket' : ticket,
-        'user_email': userInfo['name']     
+        'user_name': userInfo['name'],
+        'role': userInfo['role'],
+        'page' : 'tickets' 
     }
     return render_template('tickets.html',data=data)
