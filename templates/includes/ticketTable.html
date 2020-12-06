@@ -21,6 +21,9 @@
                         <th>Project</th>
                         <th>Priority</th>
                         <th>Status</th>
+                        {% if data.role == 'dev' %}
+                            <th>Developer assigned</th>
+                        {% endif %}
                         <th>Created date</th>
                         <th>Closed date</th>
                     </tr>
@@ -34,6 +37,9 @@
                         <td>{{ t.p_id }}</td>
                         <td>{{ t.priority }}</td>
                         <td>{{ t.status }}</td>
+                        {% if data.role == 'dev' %}
+                            <td>{{ t.users_id }}</td>
+                        {% endif %}
                         <td>{{ t.create_date }}</td>
                         <td>{{ t.close_date }}</td>
                         {% if data.page == "tickets" %}

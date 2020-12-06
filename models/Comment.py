@@ -3,13 +3,13 @@ from app import db
 class Comment(db.Model):
     c_id = db.Column(db.Integer, primary_key=True)
     t_id = db.Column(db.Integer)
-    user_id = db.Column(db.Integer)
+    users_id = db.Column(db.Integer)
     date = db.Column(db.String)
     comment = db.Column(db.String)
     
-    def __init__(self, t_id, user_id, t_update_date, comment):
+    def __init__(self, t_id, users_id, t_update_date, comment):
         self.t_id = t_id
-        self.user_id = user_id
+        self.users_id = users_id
         self.date = t_update_date
         self.comment = comment
 
@@ -19,7 +19,7 @@ class Comment(db.Model):
     def format(self):
         return {
         't_id' : self.t_id,
-        'user_id' : self.user_id,
+        'users_id' : self.users_id,
         'comment' : self.comment,
         'date' : self.date
         }

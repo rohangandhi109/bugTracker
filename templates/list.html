@@ -1,6 +1,6 @@
 {% include '/includes/head.html' %}
 
-    <title>User</title>
+    <title>{{ data.role }}</title>
 
 </head>
 
@@ -17,14 +17,20 @@
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
 
+                    {% if data.page == "tickets"%}
                     <!-- Page Heading -->
-					<a href="/ticket-form" class="btn btn-info btn-icon-split">
-                                        
-                        <span class="text">Create Ticket</span>
-                    </a>
-					<hr>
+                        <a href="/ticket-form" class="btn btn-info btn-icon-split">
+                                            
+                            <span class="text">Create Ticket</span>
+                        </a>
+                        <hr>
+                        {% include '/includes/ticketTable.html' %}
 
-                    {% include '/includes/ticketTable.html' %}
+                    {% elif data.page == "projects" %}
+                    
+                        {% include '/includes/projectList.html' %}
+                    
+                    {% endif %}
 
                 </div>
                 <!-- /.container-fluid -->
@@ -39,12 +45,6 @@
 
     </div>
     <!-- End of Page Wrapper -->
-
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
-
     {% include '/includes/logout.html' %}
 
     {% include '/includes/jsimport.html' %}

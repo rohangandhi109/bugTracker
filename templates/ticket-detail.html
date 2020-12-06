@@ -1,6 +1,6 @@
 {% include '/includes/head.html' %}
 
-    <title>User</title>
+    <title>{{ data.role }}</title>
 
 </head>
 
@@ -28,42 +28,70 @@
 
                     <form action="/add-comment" method="POST">
                         <label for="comment">Add Comment</label>
+
                         <br>
+                        {% for t in data.ticket %}
+                            <input type="hidden" name="ticket_id" value="{{ t.id }}" />
+                        {% endfor %}
                         <input id="comment" type="text" name="comment"/>
+
+                        <button type="submit" href="/">Submit</button>
                     </form>
                     <br>
 
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">History</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="80%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>Ticket ID</th>
-                                            <th>Developer assigned</th>
-                                            <th>Status</th>
-                                            <th>Updated date</th>
-                                            <th>comments</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for d in data.detail %}
-                                        <tr>
-                                            <td>{{ d.id }}</td>
-                                            <td>{{ d.user_id }}</td>
-                                            <td>{{ d.status }}</td>
-                                            <td>{{ d.update_date }}</td>
-                                            <td>{{ d.comment }}</td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
+                    <div class="row">
+                        <div class="detailcard shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">History</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="dataTable" width="80%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Developer assigned</th>
+                                                <th>Status</th>
+                                                <th>Priority</th>
+                                                <th>Updated date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for d in data.detail %}
+                                            <tr>
+                                                <td>{{ d.users_id }}</td>
+                                                <td>{{ d.status }}</td>
+                                                <td>{{ d.priority }}</td>
+                                                <td>{{ d.update_date }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
+                        <!--- comments     ---->
+                        <div class="detailcard shadow mb-4 ml-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Comments</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <ul>
+                                        {% for c in data.comment %}
+                                        <li>
+                                            <h5>{{ c.comment }}</h5>
+                                            <h6>-by {{ c.users_id }} on {{ c.date }}<h6>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
+
+
+
                 </div>
                 <!-- /.container-fluid -->
 
@@ -77,11 +105,6 @@
 
     </div>
     <!-- End of Page Wrapper -->
-
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
 
     {% include '/includes/logout.html' %}
 
