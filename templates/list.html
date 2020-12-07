@@ -3,10 +3,15 @@
     <title>{{ data.role }}</title>
 
 </head>
+<body id="page-top">
 
-{% include '/includes/sidebar.html' %}
+    <!-- Page Wrapper -->
+    <div id="wrapper">
 
-        <!-- Content Wrapper -->
+
+        {% include '/includes/sidebar.html' %}
+
+       <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
 
             <!-- Main Content -->
@@ -24,10 +29,12 @@
                             <span class="text">Create Ticket</span>
                         </a>
                         <hr>
-                        {% include '/includes/ticketTable.html' %}
-
+                        <div>
+                            {% include '/includes/ticketTable.html' %}
+                        </div>
+                        
                     {% elif data.page == "projects" %}
-                    
+
                         {% include '/includes/projectList.html' %}
                     
                     {% endif %}

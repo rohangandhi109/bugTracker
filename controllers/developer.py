@@ -7,6 +7,7 @@ from flask import abort, render_template,session, jsonify
 from datetime import date
 from sqlalchemy import text
 from auth import *
+import json
 
 @app.route('/dev/tickets')
 def get_project_tickets():
@@ -14,6 +15,7 @@ def get_project_tickets():
     dev_email = userInfo['email']
     if userInfo['role'] != 'dev':
         abort(401)
+
     sql = text("""SELECT tick.t_id, tick.t_title, tick.t_desc, tick.users_id, tick.submitter_email, tick.p_id, tick.t_priority, tick.t_status, tick.t_type, tick.t_create_date, tick.t_close_date
                 FROM   ticket tick 
                 INNER JOIN (SELECT map.p_id
@@ -28,7 +30,7 @@ def get_project_tickets():
         'ticket' : ticket,
         'user_name': userInfo['name'],
         'role': userInfo['role'],
-        'page' : 'tickets' 
+        'page' : 'tickets'
     }
     return render_template('list.html',data=data)
 
@@ -47,6 +49,3 @@ def get_dev_project():
         'page' : 'projects'
     }
     return render_template('list.html',data=data)
-
-
-    return ""

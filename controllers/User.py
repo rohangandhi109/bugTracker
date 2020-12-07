@@ -16,7 +16,7 @@ def get_tickets():
             .add_columns(Ticket.t_id,Ticket.users_id,Ticket.submitter_email,\
             Ticket.t_title,Ticket.t_desc,Ticket.t_priority,Ticket.t_type,\
             Ticket.t_status,Ticket.t_create_date,Ticket.t_close_date,Project.p_name.label('p_id'))\
-            .filter(Ticket.submitter_email==user_email).all()
+            .filter(Ticket.submitter_email==user_email).order_by(Ticket.t_id.asc()).all()
     ticket = [Ticket.format(tick) for tick in ticket]
     data={
         'ticket' : ticket,

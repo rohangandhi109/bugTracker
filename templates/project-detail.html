@@ -1,0 +1,94 @@
+{% include '/includes/head.html' %}
+
+    <title>{{ data.role }}</title>
+
+</head>
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+
+        {% include '/includes/sidebar.html' %}
+
+       <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                {% include '/includes/topbar.html' %}
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    <div class="card shadow mb-4 mr-2 ml-2">
+                        <div class="card-header py-3">
+                            <h4 class="m-0 font-weight-bold text-primary">
+                                {{ data.project.name }}
+                            </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <h6 class="font-weight-lighter font-italic">Description: {{ data.project.desc }}</h6>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="detailcard shadow mb-4 ml-2 mr-3">
+                                    <div class="card-header py-3">
+                                        <h6 class="m-0 font-weight-bold text-primary">User</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered" id="dataTable" width="80%" cellspacing="0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Name</th>
+                                                        <th>Email</th>
+                                                        <th>Role</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for d in data.users %}
+                                                    <tr>
+                                                        <td>{{ d.name }}</td>
+                                                        <td>{{ d.email }}</td>
+                                                        <td>{{ d.role }}</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    {% include '/includes/ticketTable.html' %} 
+
+                                </div>
+                                
+
+                            </div>            
+
+                        </div>
+                    </div>
+
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            {% include '/includes/footer.html' %}
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+    {% include '/includes/logout.html' %}
+
+    {% include '/includes/jsimport.html' %}
+   
+</body>
+
+</html>

@@ -42,7 +42,7 @@ from models.Map_users_proj import Map_users_proj
 from models.Project import Project
 from models.Ticket_history import Ticket_history
 from models.Comment import Comment
-from controllers import user, developer,ticket,comment
+from controllers import user, developer,ticket,comment,project
 
 @app.route('/')
 def login():

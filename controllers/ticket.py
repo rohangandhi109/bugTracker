@@ -87,3 +87,5 @@ def get_ticket_details(ticket_id):
         'page':'ticket_detail'
     }
     return render_template('ticket-detail.html',data=data)
+
+    

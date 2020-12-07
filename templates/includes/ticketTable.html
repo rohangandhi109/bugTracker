@@ -2,47 +2,55 @@
 <div class="card shadow mb-4">
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold text-primary">
-        {% if data.page == "tickets" %}
-            My Tickets
-        {% elif data.page == "ticket_detail" %}
-            Ticket Detail
-        {% endif %}
-        
+                My Tickets
         </h6>
-</div>
+    </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0">
                 <thead>
                     <tr>
-                        <th>Ticket ID</th>
+                        {% if data.page !='project_detail' %}
+                            <th>Ticket ID</th>
+                        {% endif %}
                         <th>Title</th>
-                        <th>Description</th>
-                        <th>Project</th>
+                        {% if data.page !='project_detail' %}
+                            <th>Description</th>
+                            <th>Project</th>
+                            {% endif %}
                         <th>Priority</th>
                         <th>Status</th>
                         {% if data.role == 'dev' %}
-                            <th>Developer assigned</th>
+                            <th>Developer</th>
                         {% endif %}
-                        <th>Created date</th>
-                        <th>Closed date</th>
+                        {% if data.page !='project_detail' %}
+                            <th>Created date</th>
+                            <th>Closed date</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for t in data.ticket %}
                     <tr>
-                        <td>{{ t.id }}</td>
+                        {% if data.page !='project_detail' %}
+                            <td>{{ t.id }}</td>
+                        {% endif %}
                         <td>{{ t.title }}</td>
-                        <td>{{ t.desc }}</td>
-                        <td>{{ t.p_id }}</td>
+                        {% if data.page !='project_detail' %}
+                            <td>{{ t.desc }}</td>
+                            <td>{{ t.p_id }}</td>
+                            {% endif %}
+                        
                         <td>{{ t.priority }}</td>
                         <td>{{ t.status }}</td>
                         {% if data.role == 'dev' %}
                             <td>{{ t.users_id }}</td>
                         {% endif %}
-                        <td>{{ t.create_date }}</td>
-                        <td>{{ t.close_date }}</td>
-                        {% if data.page == "tickets" %}
+                        {% if data.page !='project_detail' %}
+                            <td>{{ t.create_date }}</td>
+                            <td>{{ t.close_date }}</td>
+                        {% endif %}
+                        {% if data.page == "tickets" or data.page == 'project_detail' %}
                             <td><a href="/ticket-details/{{ t.id }}">details</td>
                         {% endif %}
                     </tr>
