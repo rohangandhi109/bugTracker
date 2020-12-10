@@ -3,6 +3,8 @@ from models.Ticket import Ticket
 from models.Project import Project
 from models.Users import Users
 from models.Ticket_history import Ticket_history
+from models.Map_users_proj import Map_users_proj
+from models.Notification import Notification
 from models.Comment import Comment
 from flask import abort, request,render_template,redirect,url_for,session
 import sys
@@ -46,6 +48,15 @@ def create_ticket():
     except:
         print(sys.exc_info())
         abort(500)
+
+    project_user = Map_users_proj.query.with_entities(Map_users_proj.users_id).filter(Map_users_proj.p_id == p_id).all()
+    for p in project_user:
+        notify = Notification(ticket.t_id, p, type='new')
+        try:
+            notify.insert()
+        except:
+            print(sys.exc_info())
+            abort(500)
     
     if userInfo['role'] == 'dev':
         return redirect(url_for('get_project_tickets'))
@@ -78,13 +89,19 @@ def get_ticket_details(ticket_id):
 
     comment = [Comment.format(co) for co in comment]
 
+    project_user = Ticket.query.join(Map_users_proj, Ticket.p_id == Map_users_proj.p_id)\
+        .join(Users, Users.users_id == Map_users_proj.users_id)\
+            .add_columns(Users.users_id, Users.users_name)\
+                .filter(Ticket.t_id == ticket_id).filter(Users.users_role == 'dev').all()
+
     data = {
         'ticket': [ticket.format()],
         'detail': detail,
         'role': userInfo['role'],
         'user_name': userInfo['name'],
         'comment': comment,
-        'page':'ticket_detail'
+        'page':'ticket_detail',
+        'project_user': project_user
     }
     return render_template('ticket-detail.html',data=data)
 

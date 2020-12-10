@@ -22,12 +22,22 @@
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
 
-                    {% if data.page == "tickets"%}
+                    {% if data.page == "tickets" %}
                     <!-- Page Heading -->
                         <a href="/ticket-form" class="btn btn-info btn-icon-split">
-                                            
                             <span class="text">Create Ticket</span>
                         </a>
+                        {% if data.role == "dev" %}
+                            <a href="/dev/tickets" class="btn btn-info btn-icon-split">
+                                <span class="text">All Ticket</span>
+                            </a>
+                            <a href="/dev/assigned-tickets" class="btn btn-info btn-icon-split">
+                                <span class="text">Assigned Ticket</span>
+                            </a>
+                            <a href="/dev/my-tickets" class="btn btn-info btn-icon-split">
+                                <span class="text">Submitted Ticket</span>
+                            </a>
+                        {% endif %}
                         <hr>
                         <div>
                             {% include '/includes/ticketTable.html' %}
