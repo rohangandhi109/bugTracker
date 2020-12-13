@@ -2,12 +2,16 @@ from app import app,db
 from models.Ticket import Ticket
 from models.Project import Project
 from models.Map_users_proj import Map_users_proj
+from models.Ticket_history import Ticket_history
+from models.Notification import Notification
+from models.Comment import Comment
 from models.Users import Users
+from controllers import notification
 from flask import abort, render_template,session, request,redirect, url_for
 from datetime import date
 from sqlalchemy import text
 from auth import *
-import json
+import json,sys
 
 @app.route('/dev/tickets')
 def get_project_tickets():
@@ -30,6 +34,7 @@ def get_project_tickets():
         'user_name': userInfo['name'],
         'role': userInfo['role'],
         'page' : 'tickets',
+        'notify': notification.notify(userInfo['id']),
         'tickets_type' : 'all'
     }
     return render_template('list.html',data=data)
@@ -47,6 +52,7 @@ def get_project_assigned_tickets():
         'user_name': userInfo['name'],
         'role': userInfo['role'],
         'page' : 'tickets',
+        'notify': notification.notify(userInfo['id']),
         'tickets_type' : 'assigned'
     }
     return render_template('list.html',data=data)
@@ -68,6 +74,7 @@ def get_project_submitted_tickets():
         'user_name': userInfo['name'],
         'role': userInfo['role'],
         'page' : 'tickets',
+        'notify': notification.notify(userInfo['id']),
         'tickets_type' : 'submitted'
     }
     return render_template('list.html', data=data)
@@ -77,6 +84,33 @@ def assign_dev_ticket():
     ticket = Ticket.query.get(request.form.get('ticket_id'))
     ticket.users_id = request.form.get('user_name')
     ticket.update()
+    
+    #insert Ticket History of assign the Devloper
+    ticket_history = Ticket_history(ticket.t_id, ticket.users_id, ticket.t_status, date.today().strftime("%d/%m/%Y") , ticket.t_priority)
+    try:
+        ticket_history.insert()
+    except:
+        print('error')
+
+    #insert comment of which User assigned the Dev
+    userInfo = session.get('userProfile', 'not set')
+    user1 = userInfo['id']
+    user2 = Users.query.with_entities(Users.users_name).filter(Users.users_id == ticket.users_id).one()
+    text = user2[0] + ' assigned to this ticket'
+    comment = Comment(ticket.t_id, user1, date.today().strftime("%d/%m/%Y"), text)
+    try:
+        comment.insert()
+    except:
+        print(sys.exc_info())
+    
+    #insert notification for assignnig the Dev
+    notify = Notification(ticket.t_id, ticket.users_id,'assigned')
+    try:
+        notify.insert()
+    except:
+        print(sys.exc_info())
+    
+
     return redirect('/ticket-details/'+ request.form.get('ticket_id'))
 
 @app.route('/dev/projects')
@@ -91,6 +125,7 @@ def get_dev_project():
         'project' : project,
         'user_name': userInfo['name'],
         'role': userInfo['role'],
+        'notify': notification.notify(userInfo['id']),
         'page' : 'projects'
     }
     return render_template('list.html',data=data)

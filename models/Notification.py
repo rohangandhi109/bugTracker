@@ -16,6 +16,7 @@ class Notification(db.Model):
 
     def format(self):
         return {
+        'n_id' : self.n_id,
         't_id' : self.t_id,
         'users_id' : self.users_id,
         'type' : self.type,
@@ -25,7 +26,7 @@ class Notification(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def update(self):
+    def update():
         db.session.commit()
 
     def delete(self):

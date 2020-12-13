@@ -5,6 +5,7 @@ from models.Users import Users
 from models.Ticket_history import Ticket_history
 from models.Map_users_proj import Map_users_proj
 from models.Notification import Notification
+from controllers.notification import notify
 from models.Comment import Comment
 from flask import abort, request,render_template,redirect,url_for,session
 import sys
@@ -69,18 +70,11 @@ def get_ticket_details(ticket_id):
     ticket = Ticket.query.get(ticket_id)
     if not ticket:
         abort(404)
-    sql = text("""SELECT tick_detail.t_id, 
-                filter.users_name as users_id, 
-                tick_detail.t_status, 
-                tick_detail.t_update_date,
-                tick_detail.priority
-                FROM   ticket_history tick_detail 
-                INNER JOIN (SELECT u.users_name, tick.t_id FROM users u
-                LEFT OUTER JOIN (SELECT users_id, t_id FROM ticket WHERE  t_id = '"""+ str(ticket_id) +"""') tick 
-                ON u.users_id = tick.users_id) filter 
-                ON tick_detail.t_id = filter.t_id  """)
-    detail = db.session.execute(sql)
-    detail = [row for row in detail]
+
+    detail = Ticket_history.query.join(Users,Ticket_history.users_id == Users.users_id,isouter=True)\
+        .add_columns(Ticket_history.t_id,Ticket_history.t_status,Ticket_history.t_update_date, Ticket_history.priority,Users.users_name.label('users_id'))\
+            .filter(Ticket_history.t_id == ticket_id)
+
     detail = [Ticket_history.format(row) for row in detail]
     
     comment = Comment.query.join(Users, Comment.users_id==Users.users_id)\
@@ -101,6 +95,7 @@ def get_ticket_details(ticket_id):
         'user_name': userInfo['name'],
         'comment': comment,
         'page':'ticket_detail',
+        'notify': notify(userInfo['id']),
         'project_user': project_user
     }
     return render_template('ticket-detail.html',data=data)
