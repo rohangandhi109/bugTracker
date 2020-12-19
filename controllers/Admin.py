@@ -65,11 +65,15 @@ def get_user_history(Id):
     user = Users.query.get(Id)
     user = user.format()
     
-    # Get all the projects 
+    # Get all projects of the user
     project = Project.query.join(Map_users_proj, Map_users_proj.p_id==Project.p_id)\
         .add_columns(Project.p_id.label('id'), Project.p_name.label('name'))\
             .filter(Map_users_proj.users_id==Id)
-    
+
+    # Get all the projects
+    all_project = Project.query.all()
+    all_project = [p.format() for p in all_project]
+
     # Get the tickets of the user/dev/manager
     ticket = ""
     if user['role']=='user':
@@ -84,6 +88,7 @@ def get_user_history(Id):
     data = {
         'users' : [user],
         'projects': project,
+        'all_projects': all_project,
         'ticket': ticket,
         'user_name': userInfo['name'],
         'role': userInfo['role'],
@@ -115,3 +120,33 @@ def edit_user():
     user_update.update()
 
     return redirect('/user-history/'+id)
+
+@app.route('/assign-project', methods=['POST'])
+def assign_project():
+    user_id=request.form.get('user_id')
+    project_id = request.form.get('project')
+    role = request.form.get('role')
+    assign_date = date.today().strftime("%d/%m/%Y")
+    
+    map = Map_users_proj(project_id,user_id,role,assign_date,'N/A')
+    try:
+        map.insert()
+    except:
+        print(sys.exc_info())
+        abort(500)
+
+    return redirect('/user-history/'+user_id)
+
+@app.route('/remove-project')
+def remove_project():
+    user_id = request.args.get('userid')
+    project_id = request.args.get('projectid')
+    map = Map_users_proj.query.filter(Map_users_proj.p_id==project_id).filter(Map_users_proj.users_id==user_id).one()
+    
+    try:
+        map.delete()
+    except:
+        print(sys.exc_info())
+        abort(500)
+
+    return redirect('/user-history/'+user_id)

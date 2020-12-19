@@ -25,11 +25,46 @@
 
                     {% include '/includes/usersTable.html' %}
                     <hr>
-                    
+
+                    <div class="row">
+                        <div class="detailcard shadow ">
+                            
+                            <button id="myBtn">Assign Project</button>
+
+                            <!-- The Modal -->
+                            <div id="myModal" class="modal">
+                            
+                              <!-- Modal content -->
+                              <div class="modal-content">
+                                  <div class="detailcard shadow mb-4">
+                                    <form action="/assign-project" method="POST">
+                                        {% for u in data.users %}
+                                            <input type="hidden" name="user_id" value="{{ u.id }}" />
+                                        {% endfor %}
+                                        <select name="project" id="project" style="width:15rem;">
+                                            {% for all in data.all_projects %}
+                                                <option value= {{ all.id }}>{{ all.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <select name="role" id="role" style="width:15rem;">
+                                            <option value= "dev">Developer</option>
+                                            <option value= "user">User</option>
+                                            <option value= "manager">Manager</option>
+                                        </select>  
+                                        <button type="submit" href="/">Assign</button>
+                                    </form>
+                                  </div>
+                              </div>
+                            
+                            </div>  
+                        </div>
+                    </div>
+
+                    <hr>
                     <div class="row">
                         <div class="detailcard shadow mb-4">
                             <div class="card-header py-3">
-                                <h6 class="m-0 font-weight-bold text-primary">Projects</h6>
+                                <h6 class="m-0 font-weight-bold text-primary">Projects</h6> 
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -46,7 +81,13 @@
                                             <tr>
                                                 <td>{{ pro.id }}</td>
                                                 <td>{{ pro.name }}</td>
-                                                <td><a href="/">Remove</a></td>
+                                                {% for u in data.users %}
+                                                    <td>
+                                                        <a href="/remove-project?userid={{ u.id }}&projectid={{pro.id}}">
+                                                            Remove
+                                                        </a>
+                                                    </td>
+                                                {% endfor %}
                                             </tr>
                                             {% endfor %}
                                         </tbody>
