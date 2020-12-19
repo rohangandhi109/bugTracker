@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Ticket</title>
+        <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+        <link rel="stylesheet" href="/static/css/form-style.css" type="text/css">
+    </head>
+
+    <body>
+        <div class="testbox">
+            {% if data.edit=="true" %}
+                <form action="/edit-user" method="POST">
+            {% else %}
+                <form action="/add-user" method="POST">
+            {% endif %}
+                <br>
+                <fieldset>
+                    <legend>Ticket Information</legend>
+                    <div class="colums">
+                        <div class="item">
+                            <label for="name"> Name</label>
+                            {% if data.edit =="true" %}
+                                <input id="name" type="text" name="name" value="{{ data.user.name}}" />
+                            {% else %}
+                                <input id="name" type="text" name="name" />
+                            {% endif %}
+                        </div>
+                        <div class="item">
+                            <label for="email">Email</label>
+                            {% if data.edit == "true" %}
+                                <input id="email" type="text" name="email" value="{{ data.user.email }}" />
+                                <input id="id" type="hidden" name="id" value="{{ data.user.id }}"  />
+                            {% else %}
+                                <input id="email" type="text" name="email" />
+                            {% endif %}
+                        </div>
+                        <div class="item">
+                            <label for="Role">Role</label>
+                            <br>
+                            <select name="role" id="role" style="width:38rem; height:2rem">
+                                {% if data.edit=="true" %}
+                                    {% for role in data.array %}
+                                        {% if data.user.role==role %}
+                                            <option selected="selected" value="{{ role }}" >{{ role }}</option>
+                                        {% else %}
+                                            <option value="{{ role }}" >{{ role }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    {% for role in data.array %}
+                                        <option value="{{ role }}" >{{ role }}</option>
+                                    {% endfor %}
+                                {% endif %}
+
+                            </select>
+                        </div>
+                    </div>
+                </fieldset>
+                <div class="btn-block">
+                    <button type="submit" href="/">Submit</button>
+                </div>
+            </form>
+        </div>
+
+    </body>
+</html>

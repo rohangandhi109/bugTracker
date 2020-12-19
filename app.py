@@ -43,7 +43,7 @@ from models.Project import Project
 from models.Ticket_history import Ticket_history
 from models.Notification import Notification
 from models.Comment import Comment
-from controllers import user, developer,ticket,comment,project
+from controllers import user, developer,ticket,comment,project,Admin
 
 @app.route('/')
 def login():
@@ -63,6 +63,8 @@ def callback_handling():
         'name':userinfo['nickname'],
         'id':users['id']
     }
+    if(users['role'] == "admin"):
+        return redirect('/'+ users['role']+ '/users')
     return redirect('/'+ users['role']+ '/tickets')
 
 @app.route('/logout')

@@ -21,6 +21,17 @@
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
+                    {% if data.role == "admin" %}
+                    <a href="/user-form" class="btn btn-info btn-icon-split">
+                        <span class="text">Add User</span>
+                    </a>
+
+                    <hr>
+                    <div>
+                        {% include '/includes/usersTable.html' %}
+                    </div>
+                    
+                    {% endif %}
 
                     {% if data.page == "tickets" %}
                     <!-- Page Heading -->

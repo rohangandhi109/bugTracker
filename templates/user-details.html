@@ -1,0 +1,110 @@
+{% include '/includes/head.html' %}
+
+    <title>{{ data.role }}</title>
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+
+{% include '/includes/sidebar.html' %}
+
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                {% include '/includes/topbar.html' %}
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+
+                    {% include '/includes/usersTable.html' %}
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="detailcard shadow mb-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Projects</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Project Id</th>
+                                                <th>Project Name</th>
+                                                <th>Remove</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for pro in data.projects %}
+                                            <tr>
+                                                <td>{{ pro.id }}</td>
+                                                <td>{{ pro.name }}</td>
+                                                <td><a href="/">Remove</a></td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!--- Tickets     ---->
+                        <div class="detailcard shadow mb-4 ml-4">
+                            <div class="card-header py-3">
+                                <h6 class="m-0 font-weight-bold text-primary">Tickets</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="dataTable2" width="100%" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th>Ticket Id</th>
+                                                <th>Ticket title</th>
+                                                <th>Project Name</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for tick in data.ticket %}
+                                            <tr>
+                                                <td>{{ tick.id }}</td>
+                                                <td><a href="/ticket-details/{{tick.id}}">{{ tick.title }}</a></td>
+                                                <td>{{ tick.project }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            {% include '/includes/footer.html' %}
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+
+    {% include '/includes/logout.html' %}
+
+    {% include '/includes/jsimport.html' %}
+   
+</body>
+
+</html>

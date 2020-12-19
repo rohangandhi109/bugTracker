@@ -13,6 +13,13 @@
             <hr class="sidebar-divider my-2	">
 
             <!-- Nav Item - Dashboard -->
+            {% if data.role=="admin" %}
+            <li class="nav-item ml-5">
+                <a class="nav-link" href="/{{ data.role }}/users">
+                    <i class="fas fa-users"></i>
+                  <span>Users</span></a>
+            </li>
+            {% endif %}
             <li class="nav-item ml-5">
                 <a class="nav-link" href="/{{ data.role }}/tickets">
                     <i class="fas fa-fw fa-table"></i>
