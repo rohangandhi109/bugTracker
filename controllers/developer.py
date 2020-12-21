@@ -130,3 +130,35 @@ def get_dev_project():
     }
     return render_template('list.html',data=data)
 
+@app.route('/change-status', methods=['POST'])
+def change_ticket_status():
+    ticket_id = request.form.get('ticketid')
+    project_id = request.form.get('projectid')
+    status = request.form.get('status')
+    t_date= date.today().strftime("%d/%m/%Y")
+    ticket = Ticket.query.get(ticket_id)
+    
+    if ticket.t_status != status:
+        ticket_history = Ticket_history(ticket_id,ticket.users_id,status,t_date,ticket.t_priority)
+        try: 
+            ticket_history.insert()
+        except:
+            print(sys.exc_info())
+            abort(500)
+    
+        project_user = Map_users_proj.query.with_entities(Map_users_proj.users_id).filter(Map_users_proj.p_id == project_id).all()
+        for p in project_user:
+            notify = Notification(ticket_id, p, type='update')
+            try:
+                notify.insert()
+            except:
+                print(sys.exc_info())
+                abort(500)
+    
+    if ticket.t_status!=status and status == "closed":
+        ticket.t_close_date=t_date
+    
+    ticket.t_status = status
+    ticket.update()
+    
+    return redirect('/ticket-details/'+ str(ticket_id))

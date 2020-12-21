@@ -127,18 +127,54 @@ def assign_project():
     project_id = request.form.get('project')
     role = request.form.get('role')
     assign_date = date.today().strftime("%d/%m/%Y")
+    action_type = request.form.get('type')
+
+    if action_type=='Assign':
+        map = Map_users_proj(project_id,user_id,role,assign_date,'N/A')
+        try:
+            map.insert()
+        except:
+            print(sys.exc_info())
+            abort(500)
+    elif action_type=='Change':
+        map = Map_users_proj.query.filter(Map_users_proj.users_id==user_id).filter(Map_users_proj.p_id==project_id).one()
+        map.users_role=role
+        map.update()
+
+    project_details = request.form.get('project_details')
+    if project_details=='true':
+        return redirect('/project-details/'+project_id)
+    else:
+        return redirect('/user-history/'+user_id)
+
+@app.route('/user-remove-project')
+def remove_user_from_project():
+    data = remove_from_project()
+    return redirect('/user-history/'+data['user_id'])
+
+@app.route('/remove-project-user')
+def remove_project_user():
+    data = remove_from_project()
+    return redirect('/project-details/'+data['project_id'])
+
+
+@app.route('/admin/projects')
+def get_all_projects():
+    userInfo = session.get('userProfile', 'not set')
     
-    map = Map_users_proj(project_id,user_id,role,assign_date,'N/A')
-    try:
-        map.insert()
-    except:
-        print(sys.exc_info())
-        abort(500)
+    project =Project.query.all()
+    project = [pro.format() for pro in project]
+    
+    data={
+        'project' : project,
+        'user_name': userInfo['name'],
+        'role': userInfo['role'],
+        'page' : 'projects'
+    }
+    return render_template('list.html',data=data)
 
-    return redirect('/user-history/'+user_id)
 
-@app.route('/remove-project')
-def remove_project():
+def remove_from_project():
     user_id = request.args.get('userid')
     project_id = request.args.get('projectid')
     map = Map_users_proj.query.filter(Map_users_proj.p_id==project_id).filter(Map_users_proj.users_id==user_id).one()
@@ -148,5 +184,32 @@ def remove_project():
     except:
         print(sys.exc_info())
         abort(500)
+    data = {
+        'user_id':user_id,
+        'project_id':project_id
+    }
+    return data
 
-    return redirect('/user-history/'+user_id)
+@app.route('/admin/tickets')
+def get_all_tickets():
+    userInfo = session.get('userProfile', 'not set')
+    user_email=userInfo['email']
+    ticket = Ticket.query.all()
+    ticket = [Ticket.format(tick) for tick in ticket]
+    data={
+        'ticket' : ticket,
+        'user_name': userInfo['name'],
+        'role': userInfo['role'],
+        'page' : 'tickets'
+    }
+    return render_template('list.html', data=data)
+
+@app.route('/delete-ticket/<int:id>')
+def delete_ticket(id):
+    ticket = Ticket.query.get(id)
+    try:
+        ticket.delete()
+    except:
+        print(sys.exc_info())
+        abort(500)
+    return redirect('/admin/tickets')

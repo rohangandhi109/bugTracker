@@ -14,17 +14,23 @@ def get_project_details(project_id):
     ticket = [tick.format() for tick in ticket]
 
     user = Users.query.join(Map_users_proj, Map_users_proj.users_id == Users.users_id)\
-        .join(Project, Project.p_id == Map_users_proj.p_id).filter(Project.p_id == project_id).all()
+        .join(Project, Project.p_id == Map_users_proj.p_id)\
+            .add_columns(Users.users_name.label('name'),Users.users_email.label('email'),Map_users_proj.users_role.label('role'))\
+        .filter(Project.p_id == project_id).all()
     
-    user = [Users.format(u) for u in user]
-
     project = Project.query.get(project_id)
+
+    all_users=""
+    if userInfo['role']=="admin":
+        all_users = Users.query.all()
+        all_users = [all.format() for all in all_users]
 
 
     data = {
         'users': user,
         'ticket': ticket,
         'project': project.format(),
+        'all_users': all_users,
         'role': userInfo['role'],
         'user_name': userInfo['name'],
         'page':'project_detail'

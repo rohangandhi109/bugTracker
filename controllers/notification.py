@@ -6,7 +6,6 @@ import sys
 def notify(id):
     notify = Notification.query.filter(Notification.users_id == id).all()
     notify = [no.format() for no in notify]
-    print(notify)
     return notify
 
 @app.route('/delete-notification')

@@ -24,40 +24,37 @@
                 <div class="container-fluid">
 
                     <!-- Page Heading -->
-					<a href="/ticket-form" class="btn btn-info btn-icon-split">
-                                        
-                        <span class="text">Create Ticket</span>
-                    </a>
-					<hr>
-
                     {% include '/includes/ticketTable.html' %}
                     {% if data.role!="admin"  %}
                         <div class="row">
                             <div class="detailcard shadow mb-4">
-                                <br>
                                 <form action="/dev/assign-ticket" method="POST">
+                                    <label class="ml-3">Assign Developer:</label> 
+                                    <br>
+                                    
                                     {% for t in data.ticket %}
                                         <input type="hidden" name="ticket_id" value="{{ t.id }}" />
                                     {% endfor %}
-                                    <select name="user_name" id="user_name" style="width:15rem;">
+                                    
+                                    <select name="user_name" id="user_name" style="width:10rem;height:2rem;">
                                     {% for user in data.project_user %}
                                             <option value= {{ user.users_id }}>{{ user.users_name }}</option>
                                     {% endfor %}
                                         </select>
-                                    <button type="submit" href="/">Assign</button>
+                                    <button class="btn btn-info btn-icon-split" type="submit" style="width:5rem;">Assign</button>
                                 </form>
                             </div>
                             <div class="detailcard shadow mb-4 ml-4">
                                 <form action="/add-comment" method="POST">
-                                    <label for="comment">Add Comment</label>
+                                    <label class="ml-3">Add Comment:</label>
             
                                     <br>
                                     {% for t in data.ticket %}
                                         <input type="hidden" name="ticket_id" value="{{ t.id }}" />
                                     {% endfor %}
-                                    <input id="comment" type="text" name="comment"/>
+                                    <input id="comment" type="text" name="comment" style="width:10rem;" />
             
-                                    <button type="submit" href="/">Submit</button>
+                                    <button class="btn btn-info btn-icon-split" type="submit" style="width:5rem;">Submit</button>
                                 </form>
                             </div>
                             <br>

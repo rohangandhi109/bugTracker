@@ -3,37 +3,41 @@
     <!-- Topbar Navbar -->
     <ul class="navbar-nav ml-auto">
         <!-- Nav Item - Alerts -->
-        <li class="nav-item dropdown no-arrow mx-1">
-            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-bell fa-fw"></i>
-                <!-- Counter - Alerts -->
-                <span class="badge badge-danger badge-counter">3+</span>
-            </a>
-            <!-- Dropdown - Alerts -->
-            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                aria-labelledby="alertsDropdown">
-                <h6 class="dropdown-header">
-                    Alerts Center
-                </h6>
-                {% for notify in data.notify %}
-                    <a class="dropdown-item d-flex align-items-center" href="/delete-notification?ticket={{ notify.t_id }}&notify={{notify.n_id}}">
-                        <div class="mr-3">
-                            <div class="icon-circle bg-success">
-                                <i class="fas fa-donate text-white"></i>
-                            </div>
-                        </div>
-                        <div>
-                            {% if notify.type == "new" %}
-                                <div class="small text-gray-500">New ticket with ticket Id: {{ notify.t_id }} created</div>
-                            {% else %}
-                                <div class="small text-gray-500">New ticket with ticket Id: {{ notify.t_id }} assigned</div>
-                            {% endif %}
-                        </div>
-                    </a>
-                {% endfor %}
-            </div>
-        </li>
+        {% if data.role!="admin" %}
+            <li class="nav-item dropdown no-arrow mx-1">
+                <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-bell fa-fw"></i>
+                    <!-- Counter - Alerts -->
+                    <span class="badge badge-danger badge-counter">3+</span>
+                </a>
+                    <!-- Dropdown - Alerts -->
+                    <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                        aria-labelledby="alertsDropdown">
+                        <h6 class="dropdown-header">
+                            Alerts Center
+                        </h6>
+                        {% for notify in data.notify %}
+                            <a class="dropdown-item d-flex align-items-center" href="/delete-notification?ticket={{ notify.t_id }}&notify={{notify.n_id}}">
+                                <div class="mr-3">
+                                    <div class="icon-circle bg-success">
+                                        <i class="fas fa-donate text-white"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    {% if notify.type == "new" %}
+                                        <div class="small text-gray-500">New ticket with ticket ID: {{ notify.t_id }} created</div>
+                                    {% elif notify.type == "assigned"  %}
+                                        <div class="small text-gray-500">New ticket with ticket ID: {{ notify.t_id }} assigned</div>
+                                    {% else %}
+                                        <div class="small text-gray-500">Changed made to ticket with ID:{{ notify.t_id }}</div>
+                                    {% endif %}
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+            </li>
+        {% endif %}
         <div class="topbar-divider d-none d-sm-block"></div>
             <!-- Nav Item - User Information -->
             <li class="nav-item dropdown no-arrow">

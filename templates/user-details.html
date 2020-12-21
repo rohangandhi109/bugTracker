@@ -27,34 +27,39 @@
                     <hr>
 
                     <div class="row">
-                        <div class="detailcard shadow ">
+                        <div >
                             
-                            <button id="myBtn">Assign Project</button>
+                            <button class="btn btn-info btn-icon-split" id="myBtn" style="width:10rem">Assign Project</button>
 
                             <!-- The Modal -->
-                            <div id="myModal" class="modal">
+                            <div id="myModal" class="modal1">
                             
                               <!-- Modal content -->
-                              <div class="modal-content">
-                                  <div class="detailcard shadow mb-4">
-                                    <form action="/assign-project" method="POST">
-                                        {% for u in data.users %}
-                                            <input type="hidden" name="user_id" value="{{ u.id }}" />
-                                        {% endfor %}
-                                        <select name="project" id="project" style="width:15rem;">
-                                            {% for all in data.all_projects %}
-                                                <option value= {{ all.id }}>{{ all.name }}</option>
+                                <div class="modal-content1">
+                                    <div class="detailcard shadow mb-4">
+                                        <form action="/assign-project" method="POST">
+                                            {% for u in data.users %}
+                                                <input type="hidden" name="user_id" value="{{ u.id }}" />
                                             {% endfor %}
-                                        </select>
-                                        <select name="role" id="role" style="width:15rem;">
-                                            <option value= "dev">Developer</option>
-                                            <option value= "user">User</option>
-                                            <option value= "manager">Manager</option>
-                                        </select>  
-                                        <button type="submit" href="/">Assign</button>
-                                    </form>
-                                  </div>
-                              </div>
+                                            Project:<br>
+                                            <select name="project" id="project" style="width:15rem;">
+                                                {% for all in data.all_projects %}
+                                                    <option value= {{ all.id }}>{{ all.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <br>
+                                            Role: <br>
+                                            <select name="role" id="role" style="width:15rem;">
+                                                <option value= "dev">Developer</option>
+                                                <option value= "user">User</option>
+                                                <option value= "manager">Manager</option>
+                                            </select>  
+                                            <br><br>
+                                            <input name="type" class="btn btn-info btn-icon-split" type="submit" value="Assign" />
+                                        </form>
+                                        
+                                    </div>
+                                </div>
                             
                             </div>  
                         </div>
@@ -83,7 +88,7 @@
                                                 <td>{{ pro.name }}</td>
                                                 {% for u in data.users %}
                                                     <td>
-                                                        <a href="/remove-project?userid={{ u.id }}&projectid={{pro.id}}">
+                                                        <a href="/user-remove-project?userid={{ u.id }}&projectid={{pro.id}}&project-details=true">
                                                             Remove
                                                         </a>
                                                     </td>
