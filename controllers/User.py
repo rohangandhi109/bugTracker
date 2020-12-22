@@ -1,3 +1,8 @@
+######################################### Header ################################################
+# User controller includes                                                                      #
+# 1. View all submitted tickets     /user/tickets       only user can access                    #
+#################################################################################################
+
 from app import app
 from models.Ticket import Ticket
 from models.Project import Project
@@ -6,12 +11,21 @@ from flask import abort, request,render_template,redirect,url_for,session
 import sys
 from datetime import date
 
+################################### View All Tickets ##############################################
+# Endpoint fetches all the tickets submitted by the user                                          #
+# Renders -> list.html (displays all the tickets in a table format)                               #
+###################################################################################################
+
 @app.route('/user/tickets')
 def get_tickets():
     userInfo = session.get('userProfile', 'not set')
     user_email=userInfo['email']
+
+    # AUthorize the user
     if userInfo['role'] != 'user':
         abort(401)
+
+    # fetch list of tickets
     ticket = Ticket.query.join(Project, Project.p_id==Ticket.p_id)\
             .add_columns(Ticket.t_id,Ticket.users_id,Ticket.submitter_email,\
             Ticket.t_title,Ticket.t_desc,Ticket.t_priority,Ticket.t_type,\

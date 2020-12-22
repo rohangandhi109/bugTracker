@@ -1,12 +1,36 @@
+######################### Header ############################################################################
+# Notification is given to all the developers and project manager                                           #
+# Notified about new ticket, ticket update, ticket assigned                                                 #
+# Notification controller includes                                                                          #
+# 1. fetches list of notification   function notify()               accessed by Developers and Managers     #
+# 2. deletes a notification         Endpoint /delete-notification   accessed by Developers and Managers     #
+#############################################################################################################
+
 from models.Notification import Notification
 from app import app,db
 from flask import request,redirect,url_for
 import sys
 
+################## Fetch list of notification ###################################################
+# Function to fetch list of notification of a specific user                                     #
+# Requires -> user_id                                                                           #
+# Returns -> n: list of notification and length: number of notification                         #
+#################################################################################################
+
 def notify(id):
-    notify = Notification.query.filter(Notification.users_id == id).all()
-    notify = [no.format() for no in notify]
+    notification = Notification.query.filter(Notification.users_id == id).all()
+    notification = [no.format() for no in notification]
+    notify = {
+        'list': notification,
+        'length' : len(notification)
+    }
     return notify
+
+################### Delete a notification ###########################################################
+# Endpoint that deletes a specific notifcation                                                      #
+# Requires -> notification_id                                                                       #
+# Redirects -> /ticket-details/{ticket_id}                                                          #
+#####################################################################################################
 
 @app.route('/delete-notification')
 def deleteNotification():

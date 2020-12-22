@@ -9,7 +9,7 @@
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-bell fa-fw"></i>
                     <!-- Counter - Alerts -->
-                    <span class="badge badge-danger badge-counter">3+</span>
+                    <span class="badge badge-danger badge-counter">{{ data.notify.length }}</span>
                 </a>
                     <!-- Dropdown - Alerts -->
                     <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -17,7 +17,7 @@
                         <h6 class="dropdown-header">
                             Alerts Center
                         </h6>
-                        {% for notify in data.notify %}
+                        {% for notify in data.notify.list %}
                             <a class="dropdown-item d-flex align-items-center" href="/delete-notification?ticket={{ notify.t_id }}&notify={{notify.n_id}}">
                                 <div class="mr-3">
                                     <div class="icon-circle bg-success">

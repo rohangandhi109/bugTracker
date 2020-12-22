@@ -1,4 +1,13 @@
+####################### Header ######################################################
+# Ticket Controller Includes                                                        #
+# 1. Ticket form        /ticket-form            all can access                      #
+# 2. Create ticket      /update-ticket          all can access                      #
+# 3. Update ticket      /update-ticket          only admin can access               #
+# 4. Ticket details     /ticket-details/{Id}    all can access                      #
+#####################################################################################
+
 from app import app,db
+from info import STATUS, PRIORITY
 from models.Ticket import Ticket
 from models.Project import Project
 from models.Users import Users
@@ -11,6 +20,12 @@ from flask import abort, request,render_template,redirect,url_for,session
 import sys
 from datetime import date
 from sqlalchemy import text
+
+################################### Genrate ticket form #####################################
+# Endpoint generates a form for ticket                                                      #
+# This can be also used for editing by setting the variable "edit"="true"                   #
+# Renders -> ticket-form.html                                                               #
+#############################################################################################
 
 @app.route('/ticket-form', methods=['GET'])
 def get_ticketForm():
@@ -25,13 +40,24 @@ def get_ticketForm():
         'edit':edit,
         'ticket':ticket.format(),
         'project':project,
-        'priority':['High','low','Medium'],
-        'status':['open','closed','on-hold']
+        'priority':PRIORITY,
+        'status':STATUS
     }
     return render_template('ticket-form.html',data=data)
 
+################################### Create/Update ticket ########################################################
+# End point is used to submit the form generate above.                                                          #
+# Based on the varibale "action"-> new/update                                                                   #
+# Creating a new ticket-> add an entry to ticket_history table and Insert into notification table               #
+# Ticket status/priority updated -> add an entry to ticket_history table and Insert into notification table     #
+# Renders -> list.html (Ticket table page, if action=new)                                                       #
+# Renders -> ticket-detail.html (Ticket datails page, if action=update)                                         #
+#################################################################################################################
+
 @app.route('/update-ticket', methods=['POST'])
 def create_ticket():
+    
+    #Get all values from the ticket form
     action = request.form.get('action')
     userInfo = session.get('userProfile')
     t_title = request.form.get('t_title', '')
@@ -45,6 +71,8 @@ def create_ticket():
     t_close_date = "N/A"
 
     ticketid =""
+   
+    # Genrate a new ticket
     if action=='new':
         ticket = Ticket(t_title, t_desc, users_id, submitter_email, p_id, t_priority, 'open', t_type, t_create_date, t_close_date)
         try:
@@ -54,21 +82,26 @@ def create_ticket():
             abort(500)
         
         ticketid = ticket.t_id
+
+        # Add entry to history table 
         ticket_history = Ticket_history(ticket.t_id,users_id,'open',t_create_date,t_priority)
-        
         try:
             ticket_history.insert()
         except:
             print(sys.exc_info())
             abort(500)
 
+    # Authorize Admin
+
+
+    # update ticket 
     if action=='update':
         ticketid = request.form.get('ticketid')
         ticket = Ticket.query.get(ticketid)
         t_date = date.today().strftime("%d/%m/%Y")
         t_status = request.form.get('t_status')
         
-        # Insert into hsitory table:
+        # status/priority changed add to ticket_history table
         if ticket.t_status != t_status or ticket.t_priority!= t_priority:
             ticket_history = Ticket_history(ticketid,ticket.users_id,t_status,t_date,t_priority)
             try:
@@ -77,19 +110,25 @@ def create_ticket():
                 print(sys.exc_info())
                 abort(500)
 
+        # status=closed, update the close_date
         if ticket.t_status!='closed' and t_status=='closed':
             ticket.t_close_date = date.today().strftime("%d/%m/%Y")
+        
+        # update the ticket in the ticket table
         ticket.t_title = t_title
         ticket.t_desc = t_desc
         ticket.t_status = t_status
         ticket.t_priority = t_priority
         ticket.t_status = t_status
         ticket.t_type = t_type 
+        
         ticket.update()
         ticketid = ticket.t_id
     
-    # send notification to all project people regardless of update or add
+    # Fetch the people in the project
     project_user = Map_users_proj.query.with_entities(Map_users_proj.users_id).filter(Map_users_proj.p_id == p_id).all()
+
+    # insert a notification record for each individual
     for p in project_user:
         notify = Notification(ticketid, p, type=action)
         try:
@@ -98,6 +137,7 @@ def create_ticket():
             print(sys.exc_info())
             abort(500)
 
+    # Based on the role redirect to specific view ticket table end point
     if userInfo['role'] == 'dev':
         return redirect(url_for('get_project_tickets'))
     elif userInfo['role'] == 'user':
@@ -106,26 +146,41 @@ def create_ticket():
         return redirect('/ticket-details/'+ str(ticketid))
     else:
         return redirect(url_for('get_all_tickets'))
-    
+
+################################### Ticket Detail ###############################################
+# Endpoint fetches a specific ticket from the database and displays it.                         #
+# Fetches -> ticket details, ticket history and comments                                        #
+# Renders -> ticket-detail.html (accessable by all users)                                       #
+#################################################################################################
+
 @app.route('/ticket-details/<int:ticket_id>')
 def get_ticket_details(ticket_id):
     userInfo = session.get('userProfile')
+    
+    # Fetch ticket record from tickets table
     ticket = Ticket.query.get(ticket_id)
     if not ticket:
         abort(404)
 
+    # Fetch all the history record for this specific ticket from the ticket_history table
+    #Join ticket_history, users on id to fetch user names
     detail = Ticket_history.query.join(Users,Ticket_history.users_id == Users.users_id,isouter=True)\
         .add_columns(Ticket_history.t_id,Ticket_history.t_status,Ticket_history.t_update_date, Ticket_history.priority,Users.users_name.label('users_id'))\
             .filter(Ticket_history.t_id == ticket_id)
 
     detail = [Ticket_history.format(row) for row in detail]
     
+    # Fetch all the commnets for this specific ticket from the comments table
+    #Join comment, users on id to fetch user names.
     comment = Comment.query.join(Users, Comment.users_id==Users.users_id)\
                 .add_columns(Comment.t_id, Comment.comment, Comment.date, Users.users_name.label('users_id'))\
                 .filter(Comment.t_id==ticket_id).all()
-
     comment = [Comment.format(co) for co in comment]
 
+    #Fetch all the people in the project
+    #join map_users_proj, Ticket on project id
+    #join map_users_proj, Users on user id
+    #Function is used to assign a user to specific ticket
     project_user = Ticket.query.join(Map_users_proj, Ticket.p_id == Map_users_proj.p_id)\
         .join(Users, Users.users_id == Map_users_proj.users_id)\
             .add_columns(Users.users_id, Users.users_name)\
@@ -140,8 +195,6 @@ def get_ticket_details(ticket_id):
         'page':'ticket_detail',
         'notify': notify(userInfo['id']),
         'project_user': project_user,
-        'status':['open','closed','on-hold']
+        'status':STATUS
     }
     return render_template('ticket-detail.html',data=data)
-
-    
