@@ -49,6 +49,14 @@
                                 <span class="text">Submitted Ticket</span>
                             </a>
                         {% endif %}
+                        {% if data.role=="manager" %}
+                            <a href="/manager/tickets" class="btn btn-info btn-icon-split">
+                                <span class="text">All Ticket</span>
+                            </a>
+                            <a href="/manager/my-tickets" class="btn btn-info btn-icon-split">
+                                <span class="text">Submitted Ticket</span>
+                            </a>
+                        {% endif %}
                         <hr>
                         <div>
                             {% include '/includes/ticketTable.html' %}

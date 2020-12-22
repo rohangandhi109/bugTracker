@@ -5,7 +5,6 @@
 # 3. Submited tickets                   /dev/my-tickets             -> only dev can access          #
 # 4. assign a ticket to dev             /dev/assign-ticket          -> only dev can access          #
 # 5. dev's project                      /dev/projects               -> only dev can access          #
-# 6. change ticket status               /change-status              -> only dev can access          #
 #####################################################################################################
 
 from app import app,db
@@ -31,7 +30,7 @@ import sys
 @app.route('/dev/tickets')
 def get_project_tickets():
     
-    #Authoraize the Developer
+    #Authorise the Developer
     userInfo = session.get('userProfile', 'not set')
     dev_email = userInfo['email']
     if userInfo['role'] != 'dev':
@@ -191,51 +190,3 @@ def get_dev_project():
         'page' : 'projects'
     }
     return render_template('list.html',data=data)
-
-
-############################ Change Ticket Status ###########################################
-# Endpoint is used to change the status of the Ticket                                       #
-# Endpoint also records the status change in ticket history and notification table          #
-# Requires -> ticket_id, projet_id, updated status                                          #
-# Redirects -> ticket-details/{ticket_id}                                                   #
-#############################################################################################
-
-@app.route('/change-status', methods=['POST'])
-def change_ticket_status():
-
-    # Fetch all required information from the front end
-    ticket_id = request.form.get('ticketid')
-    project_id = request.form.get('projectid')
-    status = request.form.get('status')
-    t_date= date.today().strftime("%d/%m/%Y")
-
-    # Fetch the ticket from the backend by the ticket_id
-    ticket = Ticket.query.get(ticket_id)
-    
-    # if status changed that record it to ticket_history and notification table
-    if ticket.t_status != status:
-        ticket_history = Ticket_history(ticket_id,ticket.users_id,status,t_date,ticket.t_priority)
-        try: 
-            ticket_history.insert()
-        except:
-            print(sys.exc_info())
-            abort(500)
-    
-        project_user = Map_users_proj.query.with_entities(Map_users_proj.users_id).filter(Map_users_proj.p_id == project_id).all()
-        for p in project_user:
-            notify = Notification(ticket_id, p, type='update')
-            try:
-                notify.insert()
-            except:
-                print(sys.exc_info())
-                abort(500)
-    
-    # if updated status = closed than update the close_date in the ticket table
-    if ticket.t_status!=status and status == "closed":
-        ticket.t_close_date=t_date
-    
-    # finally update the status in the ticket table
-    ticket.t_status = status
-    ticket.update()
-    
-    return redirect('/ticket-details/'+ str(ticket_id))

@@ -9,6 +9,7 @@ from models.Map_users_proj import Map_users_proj
 from models.Ticket import Ticket
 from models.Users import Users
 from flask import session, render_template
+from controllers import notification
 
 ######################### Project Details #######################################################################
 # Endpoint is used to fetch the details of a specific project                                                   #
@@ -54,6 +55,7 @@ def get_project_details(project_id):
         'all_users': all_users,
         'role': userInfo['role'],
         'user_name': userInfo['name'],
+        'notify': notification.notify(userInfo['id']),
         'page':'project_detail'
     }
     return render_template('project-detail.html', data=data)

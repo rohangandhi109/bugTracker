@@ -22,7 +22,7 @@
                             {% endif %}
                         <th>Priority</th>
                         <th>Status</th>
-                        {% if data.role == 'dev' %}
+                        {% if data.role == 'dev' or data.role=='manager' %}
                             <th>Developer</th>
                         {% endif %}
                         {% if data.page !='project_detail' %}
@@ -32,7 +32,7 @@
                         {% if data.page == "tickets" or data.page == 'project_detail' %}
                             <th> </th>
                         {% endif %}
-                        {% if data.page == "ticket_detail" and data.role == "admin" %}
+                        {% if data.page == "ticket_detail" %}
                             <th> </th>
                         {% endif %}
                         
@@ -50,7 +50,7 @@
                             <td>{{ t.p_id }}</td>
                             {% endif %}
                         <td>{{ t.priority }}</td>
-                        {% if data.page=="ticket_detail" and data.role=="dev" %}
+                        {% if data.page=="ticket_detail" and (data.role=="dev" or data.role=="manager" ) %}
                             <td>
                                 <button class="btn btn-info btn-icon-split" id="myBtn">{{ t.status }}</button>
                                 <div id="myModal" class="modal1">
@@ -78,7 +78,7 @@
                         {% else %}
                             <td>{{ t.status }}</td>
                         {% endif %}
-                        {% if data.role == 'dev' %}
+                        {% if data.role == 'dev' or data.role=='manager' %}
                             <td>{{ t.users_id }}</td>
                         {% endif %}
                         {% if data.page !='project_detail' %}

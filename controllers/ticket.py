@@ -1,9 +1,10 @@
 ####################### Header ######################################################
 # Ticket Controller Includes                                                        #
-# 1. Ticket form        /ticket-form            all can access                      #
-# 2. Create ticket      /update-ticket          all can access                      #
-# 3. Update ticket      /update-ticket          only admin can access               #
-# 4. Ticket details     /ticket-details/{Id}    all can access                      #
+# 1. Ticket form            /ticket-form            all can access                  #
+# 2. Create ticket          /update-ticket          all can access                  #
+# 3. Update ticket          /update-ticket          only admin can access           #
+# 4. Ticket details         /ticket-details/{Id}    all can access                  #
+# 6. change ticket status   /change-status          only dev can access             #
 #####################################################################################
 
 from app import app,db
@@ -19,7 +20,6 @@ from models.Comment import Comment
 from flask import abort, request,render_template,redirect,url_for,session
 import sys
 from datetime import date
-from sqlalchemy import text
 
 ################################### Genrate ticket form #####################################
 # Endpoint generates a form for ticket                                                      #
@@ -144,7 +144,9 @@ def create_ticket():
         return redirect(url_for('get_tickets'))
     elif action=='update':
         return redirect('/ticket-details/'+ str(ticketid))
-    else:
+    elif userInfo['role'] =='manager':
+        return redirect(url_for('get_manager_tickets'))
+    elif userInfo['role']=='admin':
         return redirect(url_for('get_all_tickets'))
 
 ################################### Ticket Detail ###############################################
@@ -198,3 +200,59 @@ def get_ticket_details(ticket_id):
         'status':STATUS
     }
     return render_template('ticket-detail.html',data=data)
+
+    ############################ Change Ticket Status ###########################################
+# Endpoint is used to change the status of the Ticket                                       #
+# Endpoint also records the status change in ticket history and notification table          #
+# Requires -> ticket_id, projet_id, updated status                                          #
+# Redirects -> ticket-details/{ticket_id}                                                   #
+#############################################################################################
+
+@app.route('/change-status', methods=['POST'])
+def change_ticket_status():
+    userInfo = session.get('userProfile')
+
+    # Fetch all required information from the front end
+    ticket_id = request.form.get('ticketid')
+    project_id = request.form.get('projectid')
+    status = request.form.get('status')
+    t_date= date.today().strftime("%d/%m/%Y")
+
+    # Fetch the ticket from the backend by the ticket_id
+    ticket = Ticket.query.get(ticket_id)
+    
+    # if status changed that record it to ticket_history, notification table and add a comment
+    if ticket.t_status != status:
+        ticket_history = Ticket_history(ticket_id,ticket.users_id,status,t_date,ticket.t_priority)
+        try: 
+            ticket_history.insert()
+        except:
+            print(sys.exc_info())
+            abort(500)
+    
+        project_user = Map_users_proj.query.with_entities(Map_users_proj.users_id).filter(Map_users_proj.p_id == project_id).all()
+        for p in project_user:
+            notify = Notification(ticket_id, p, type='update')
+            try:
+                notify.insert()
+            except:
+                print(sys.exc_info())
+                abort(500)
+        
+        comment = "Satus changed to :" + status + " by :" + userInfo['name']
+        comment = Comment(ticket_id,userInfo['id'],t_date,comment)
+        try:
+            comment.insert()
+        except:
+            print(sys.exc_info())
+            abort(500)
+    
+    # if updated status = closed than update the close_date in the ticket table
+    if ticket.t_status!=status and status == "closed":
+        ticket.t_close_date=t_date
+    
+    # finally update the status in the ticket table
+    ticket.t_status = status
+    ticket.update()
+    
+    return redirect('/ticket-details/'+ str(ticket_id))
