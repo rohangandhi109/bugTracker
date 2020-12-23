@@ -8,7 +8,7 @@
 2. Project manager
     1. Dashboard: 
         all projects:
-            line graph : projects vs open tickets over a period of time (check boxes to filter porjects)
+            line graph : projects vs open tickets over a period of time (check boxes to filter projects)
         single project:        
             Bar graph -  List of tickets vs priority
             Pie chart - tickets which are open, closed, unassigned, onHold
@@ -25,3 +25,8 @@
 
 4. submitter
     Raise a ticket
+
+
+
+/// SQL:
+select count(filter.t_id), filter.p_id, date_part('month',filter.date) as month from (select tick.t_id,tick.p_id,to_date(tick.t_create_date,'DD/MM/YYYY') as date from ticket tick where p_id in (select p_id from map_users_proj where users_id=6 and users_role='manager')) filter group by filter.p_id, date_part('month',filter.date);

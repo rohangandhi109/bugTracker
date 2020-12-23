@@ -1,6 +1,6 @@
 import sys
 
-from flask import Flask, redirect, jsonify,session,url_for
+from flask import Flask, redirect, jsonify,session,url_for,render_template
 from flask_sqlalchemy import SQLAlchemy
 from authlib.integrations.flask_client import OAuth
 from six.moves.urllib.parse import urlencode
@@ -43,6 +43,7 @@ from models.Project import Project
 from models.Ticket_history import Ticket_history
 from models.Notification import Notification
 from models.Comment import Comment
+from models.MonthConfig import MonthConfig
 from controllers import user, developer,ticket,comment,project,Admin,manager
 
 @app.route('/')
@@ -66,8 +67,12 @@ def callback_handling():
     if(users['role'] == "admin"):
         return redirect('/'+ users['role']+ '/users')
     if users['role'] == "manager":
-        return redirect('/'+ users['role']+ '/tickets')
+        return redirect('/'+ users['role']+ '/dashboard')
     return redirect('/'+ users['role']+ '/tickets')
+
+@app.route('/card')
+def temp():
+    return render_template('charts.html')
 
 @app.route('/logout')
 def logout():

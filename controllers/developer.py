@@ -18,7 +18,6 @@ from models.Users import Users
 from controllers import notification
 from flask import abort, render_template,session, request,redirect, url_for
 from datetime import date
-from sqlalchemy import text
 from auth import *
 import sys
 
@@ -37,16 +36,14 @@ def get_project_tickets():
         abort(401)
 
     #Fetch query    
-    sql = text("""SELECT tick.t_id, tick.t_title, tick.t_desc, tick.users_id, tick.submitter_email, tick.p_id, tick.t_priority, tick.t_status, tick.t_type, tick.t_create_date, tick.t_close_date
-                FROM   ticket tick 
-                INNER JOIN (SELECT map.p_id
-                FROM   map_users_proj map 
-                INNER JOIN (SELECT * FROM users WHERE  users_email = '""" + dev_email+ """')
-                users ON map.users_id = users.users_id) filter 
-                ON tick.p_id = filter.p_id  """)
-    result = db.session.execute(sql)
-    result = [row for row in result]
-    ticket = [Ticket.format(row) for row in result]
+    ticket = Ticket.query.join(Map_users_proj, Map_users_proj.p_id==Ticket.p_id)\
+        .join(Users, Users.users_id==Map_users_proj.users_id)\
+            .join(Project, Project.p_id==Map_users_proj.p_id)\
+            .add_columns(Ticket.t_id.label('id'), Ticket.t_title.label('title'), Ticket.t_desc.label('desc'),\
+                Project.p_name.label('p_id'), Ticket.t_priority.label('priority'),\
+                Ticket.t_status.label('status'), Users.users_name.label('users_id'),\
+                Ticket.t_create_date.label('create_date'),Ticket.t_close_date.label('close_date'))\
+            .filter(Users.users_email==dev_email)
     data={
         'ticket' : ticket,
         'user_name': userInfo['name'],

@@ -10,3 +10,5 @@ $(document).ready(function() {
 $(document).ready(function() {
   $('#dataTable2').DataTable();
 });
+
+set('#progressbar', 10);
