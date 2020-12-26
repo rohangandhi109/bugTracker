@@ -8,5 +8,6 @@ class MonthConfig(db.Model):
         return {
         'month': self.month,
         'p_id' : self.p_id,
-        'cnt' : self.cnt
+        'cnt' : self.cnt,
+        'name': self.name,
         }

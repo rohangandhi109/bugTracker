@@ -18,7 +18,6 @@ from models.Users import Users
 from controllers import notification
 from flask import abort, render_template,session, request,redirect, url_for
 from datetime import date
-from auth import *
 import sys
 
 ###################### Fetch tickets of all the project dev belongs #############################

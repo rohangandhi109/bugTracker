@@ -53,12 +53,15 @@ def manager_dashboard():
     timePerTicket = [row for row in timePerTicket]
     timePerTicket = timePerTicket[0][0]
 
-
+    project = Project.query.join(Map_users_proj, Map_users_proj.p_id == Project.p_id)\
+                .add_columns(Project.p_id, Project.p_name)\
+                    .filter(Map_users_proj.users_id==userInfo['id'])
     data={
         'openTickets': openTickets,
         'unassignedTickets': unassignedTickets,
         'assignedTickets': assignedTickets,
         'timePerTicket' : timePerTicket,
+        'project' : project,
         'notify': notification.notify(userInfo['id']),
         'page': 'dashboard',
         'role':userInfo['role']
@@ -70,6 +73,7 @@ def get_bar_pie_chart(project_id):
     userInfo = session.get('userProfile', 'not set')
     if project_id==0:
         sql = text(""" SELECT mapid.mth_name          AS month, 
+                        proj.p_name                 AS name,
                             mapid.p_id              AS p_id, 
                             COALESCE(filter.cnt, 0) AS cnt 
                         FROM   (SELECT  config.mth_name, 
@@ -96,18 +100,19 @@ def get_bar_pie_chart(project_id):
                                     GROUP  BY filter.p_id, 
                                             Date_part('month', filter.date)) filter 
                         ON mapid.mth_id = filter.month 
-                            AND mapid.p_id = filter.p_id;  """)
+                            AND mapid.p_id = filter.p_id
+                            INNER JOIN project proj on mapid.p_id = proj.p_id;  """)
 
         chart_data = db.session.execute(sql)
         chart_data =  [MonthConfig.format(row) for row in chart_data]
         back_chart_data ={
             'chart_data': chart_data,
             'totalProjects': math.trunc(len(chart_data)/12),
-            'project' : ['BugTrack', 'Ticketcollector']
         }  
         return back_chart_data
     else:
         sql = text(""" SELECT mapid.mth_name       AS month, 
+                        proj.p_name         AS name,
                           mapid.p_id              AS p_id, 
                           COALESCE(filter.cnt, 0) AS cnt 
                     FROM   (SELECT  config.mth_name, 
@@ -127,7 +132,8 @@ def get_bar_pie_chart(project_id):
                                 GROUP  BY filter.p_id, 
                                         Date_part('month', filter.date)) filter 
                     ON mapid.mth_id = filter.month 
-                        AND mapid.p_id = filter.p_id;  """)
+                    AND mapid.p_id = filter.p_id
+                    INNER JOIN project proj on mapid.p_id = proj.p_id;  """)
         chart_data = db.session.execute(sql)
         chart_data =  [MonthConfig.format(row) for row in chart_data]   
         back_chart_data ={

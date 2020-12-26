@@ -119,22 +119,26 @@
                         </div>
                     </div>
                     <div class="card shadow">
+                        <div class="ml-2 mt-2">
+                            <select id="project_id" onchange="change_project()">
+                                    <option value="0" selected="selected" >ALL</option>
+                                {% for pro in data.project %}
+                                    <option value={{ pro.p_id }} >{{ pro.p_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
                         <div class="row ml-2 mb-2 mt-4 mr-2" >
-
                             <div class="col-xl-8 col-lg-7">
-
                                 <!-- Area Chart -->
                                 <div class="card shadow mb-4">
                                     <div class="card-header py-3">
-                                        <h6 class="m-0 font-weight-bold text-primary">Area Chart</h6>
+                                        <h6 class="m-0 font-weight-bold text-primary">Tickets Last year</h6>
                                     </div>
                                     <div class="card-body">
-                                        <div class="chart-area">
+                                        <div class="chart-area" id="chart-area">
                                             <canvas id="myAreaChart"></canvas>
                                         </div>
-                                        <hr>
-                                        Styling for the area chart can be found in the
-                                        <code>/js/demo/chart-area-demo.js</code> file.
                                     </div>
                                 </div>
                                 
@@ -152,9 +156,6 @@
                                         <div class="chart-pie pt-4">
                                             <canvas id="myPieChart"></canvas>
                                         </div>
-                                        <hr>
-                                        Styling for the donut chart can be found in the
-                                        <code>/js/demo/chart-pie-demo.js</code> file.
                                     </div>
                                 </div>
                             </div>

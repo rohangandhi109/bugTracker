@@ -27,39 +27,55 @@ function number_format(number, decimals, dec_point, thousands_sep) {
   return s.join(dec);
 }
 
-
+function change_project() {
+  get_project(document.getElementById("project_id").value)
+}
 
 $(document).ready(function () {
+  get_project(0)
+});
+
+function get_project(project_id) {
   $.ajax({
-    url: 'http://127.0.0.1:5000/manager/chart/0',
+    url: 'http://127.0.0.1:5000/manager/chart/'+ project_id,
     type: 'GET',
     dataType: 'json',
     success: (back_data) => {
-
+      var color1 = 48
+      var color2 = 10
+      var color3 = 28
       var datasets = [];
+      var increment = 255/back_data.totalProjects 
       var j = 0;
       for (i = 0; i < back_data.totalProjects; i++) { 
         var datalabels = []
         for (j = j; j < (12 + ( 12 * i))  ; j++) {
           datalabels.push(back_data.chart_data[j].cnt)
         }
+        color1 += (i * increment)
+        color2 += (i * increment)
+        color3 += (i * increment)
+        color_light = "rgba(" + color1 + "," + color2 + "," + color3 + ", 0)";
+        color_dark = "rgba(" + color1 + "," + color2 + "," + color3 + ", 1)";
         var some = {
-          label: back_data.project[i],
+          label: back_data.chart_data[j-1].name,
           lineTension: 0.3,
-          backgroundColor: "rgba(78, 115, 223, 0.05)",
-          borderColor: "rgba(78, 115, 223, 1)",
+          backgroundColor: color_light,
+          borderColor: color_dark,
           pointRadius: 3,
-          pointBackgroundColor: "rgba(78, 115, 223, 1)",
-          pointBorderColor: "rgba(78, 115, 223, 1)",
+          pointBackgroundColor: color_dark,
+          pointBorderColor: color_dark,
           pointHoverRadius: 3,
-          pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
-          pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+          pointHoverBackgroundColor: color_dark,
+          pointHoverBorderColor: color_dark,
           pointHitRadius: 10,
           pointBorderWidth: 2,
           data: datalabels
         }
         datasets.push(some)
       }
+      $('#myAreaChart').remove();
+      $('#chart-area').append('<canvas id="myAreaChart"><canvas>');
       var ctx = document.getElementById("myAreaChart");
       var myLineChart = new Chart(ctx, {
         type: 'line',
@@ -79,6 +95,10 @@ $(document).ready(function () {
           },
           scales: {
             xAxes: [{
+              scaleLabel: {
+                display: true,
+                labelString: 'Month'
+              },
               time: {
                 unit: 'date'
               },
@@ -87,12 +107,17 @@ $(document).ready(function () {
                 drawBorder: false
               },
               ticks: {
-                maxTicksLimit: 7
+                maxTicksLimit: 12
               }
             }],
             yAxes: [{
+              scaleLabel: {
+                display: true,
+                labelString: 'Tickets'
+              },
               ticks: {
-                maxTicksLimit: 5,
+                maxTicksLimit: 7,
+                stepSize: 2,
                 padding: 10,
                 // Include a dollar sign in the ticks
                 callback: function (value, index, values) {
@@ -109,7 +134,8 @@ $(document).ready(function () {
             }],
           },
           legend: {
-            display: false
+            display: true,
+            position: 'bottom'
           },
           tooltips: {
             backgroundColor: "rgb(255,255,255)",
@@ -128,7 +154,7 @@ $(document).ready(function () {
             callbacks: {
               label: function (tooltipItem, chart) {
                 var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
-                return datasetLabel + ': $' + number_format(tooltipItem.yLabel);
+                return datasetLabel + ':' + number_format(tooltipItem.yLabel);
               }
             }
           }
@@ -137,4 +163,4 @@ $(document).ready(function () {
 
     }
   })
-});
+}
