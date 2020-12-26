@@ -15,61 +15,115 @@ from controllers import notification
 @app.route('/manager/dashboard')
 def manager_dashboard():
     userInfo = session.get('userProfile', 'not set')
-
-    # Query to fetch open tickets
-    openTickets = Ticket.query.join(Map_users_proj, Map_users_proj.p_id==Ticket.p_id)\
-                    .with_entities(func.count(Ticket.t_id).label('count'))\
-                    .filter(Map_users_proj.users_id==userInfo['id'])\
-                    .filter(Ticket.t_status=='open')\
-                    .filter(Map_users_proj.users_role=='manager')\
-                    .one()
-    openTickets = openTickets[0]
-
-    #query to get unassigned tickets
-    unassignedTickets = Ticket.query.join(Map_users_proj, Map_users_proj.p_id==Ticket.p_id)\
-                        .with_entities(func.count(Ticket.t_id).label('count'))\
-                        .filter(Map_users_proj.users_id==userInfo['id'])\
-                        .filter(Ticket.users_id==0)\
-                        .filter(Map_users_proj.users_role=='manager')\
-                        .one()
-    unassignedTickets = unassignedTickets[0]
-    
-    # Ticket with status in-progess
-    assignedTickets = Ticket.query.join(Map_users_proj, Map_users_proj.p_id==Ticket.p_id)\
-                    .with_entities(func.count(Ticket.t_id).label('count'))\
-                    .filter(Map_users_proj.users_id==userInfo['id'])\
-                    .filter(Ticket.t_status=='in-progress')\
-                    .filter(Map_users_proj.users_role=='manager')\
-                    .one()
-    assignedTickets = assignedTickets[0]
-
-    #Query to get average time for ticket completion
-    sql = text(""" select cast(avg_ticket_time as INTEGER)
-            from (select avg(diff) as avg_ticket_time 
-            from (select (to_date(t_close_date,'DD/MM/YYYY') - to_date(t_create_date,'DD/MM/YYYY')) as diff 
-            from ticket where t_status='closed')x)y; """)
-
-    timePerTicket = db.session.execute(sql)
-    timePerTicket = [row for row in timePerTicket]
-    timePerTicket = timePerTicket[0][0]
-
     project = Project.query.join(Map_users_proj, Map_users_proj.p_id == Project.p_id)\
-                .add_columns(Project.p_id, Project.p_name)\
-                    .filter(Map_users_proj.users_id==userInfo['id'])
+                    .add_columns(Project.p_id, Project.p_name)\
+                    .filter(Map_users_proj.users_id==userInfo['id'])\
+                    .filter(Map_users_proj.users_role=='manager')\
+                    .all()
+  
     data={
-        'openTickets': openTickets,
-        'unassignedTickets': unassignedTickets,
-        'assignedTickets': assignedTickets,
-        'timePerTicket' : timePerTicket,
-        'project' : project,
+        'project': project,
         'notify': notification.notify(userInfo['id']),
         'page': 'dashboard',
         'role':userInfo['role']
     }
     return render_template('dashboard.html',data=data)
 
+@app.route('/manager/card/<int:project_id>')
+def get_four_card(project_id):
+    userInfo = session.get('userProfile', 'not set')
+    openTickets = ""
+    unassignedTickets = ""
+    assignedTickets = ""
+    timePerTicket = ""
+    
+    if project_id == 0:
+        # Query to fetch open tickets
+        openTickets = Ticket.query.join(Map_users_proj, Map_users_proj.p_id==Ticket.p_id)\
+                        .with_entities(func.count(Ticket.t_id).label('count'))\
+                        .filter(Map_users_proj.users_id==userInfo['id'])\
+                        .filter(Ticket.t_status=='open')\
+                        .filter(Map_users_proj.users_role=='manager')\
+                        .one()
+        openTickets = openTickets[0]
+
+        #query to get unassigned tickets
+        unassignedTickets = Ticket.query.join(Map_users_proj, Map_users_proj.p_id==Ticket.p_id)\
+                            .with_entities(func.count(Ticket.t_id).label('count'))\
+                            .filter(Map_users_proj.users_id==userInfo['id'])\
+                            .filter(Ticket.users_id==0)\
+                            .filter(Map_users_proj.users_role=='manager')\
+                            .one()
+        unassignedTickets = unassignedTickets[0]
+        
+        # Ticket with status in-progess
+        assignedTickets = Ticket.query.join(Map_users_proj, Map_users_proj.p_id==Ticket.p_id)\
+                        .with_entities(func.count(Ticket.t_id).label('count'))\
+                        .filter(Map_users_proj.users_id==userInfo['id'])\
+                        .filter(Ticket.t_status=='in-progress')\
+                        .filter(Map_users_proj.users_role=='manager')\
+                        .one()
+        assignedTickets = assignedTickets[0]
+
+        #Query to get average time for ticket completion
+        sql = text(""" select cast(avg_ticket_time as INTEGER)
+                from (select avg(diff) as avg_ticket_time 
+                from (select (to_date(t_close_date,'DD/MM/YYYY') - to_date(t_create_date,'DD/MM/YYYY')) as diff 
+                from ticket where t_status='closed')x)y; """)
+        timePerTicket = db.session.execute(sql)
+        timePerTicket = [row for row in timePerTicket]
+        timePerTicket = timePerTicket[0][0]
+
+    else :
+        openTickets = Ticket.query.join(Map_users_proj, Map_users_proj.p_id==Ticket.p_id)\
+                        .with_entities(func.count(Ticket.t_id).label('count'))\
+                        .filter(Map_users_proj.users_id==userInfo['id'])\
+                        .filter(Map_users_proj.p_id==project_id)\
+                        .filter(Ticket.t_status=='open')\
+                        .filter(Map_users_proj.users_role=='manager')\
+                        .one()
+        openTickets = openTickets[0]
+
+        #query to get unassigned tickets
+        unassignedTickets = Ticket.query.join(Map_users_proj, Map_users_proj.p_id==Ticket.p_id)\
+                            .with_entities(func.count(Ticket.t_id).label('count'))\
+                            .filter(Map_users_proj.users_id==userInfo['id'])\
+                            .filter(Map_users_proj.p_id==project_id)\
+                            .filter(Ticket.users_id==0)\
+                            .filter(Map_users_proj.users_role=='manager')\
+                            .one()
+        unassignedTickets = unassignedTickets[0]
+        
+        # Ticket with status in-progess
+        assignedTickets = Ticket.query.join(Map_users_proj, Map_users_proj.p_id==Ticket.p_id)\
+                        .with_entities(func.count(Ticket.t_id).label('count'))\
+                        .filter(Map_users_proj.users_id==userInfo['id'])\
+                        .filter(Map_users_proj.p_id==project_id)\
+                        .filter(Ticket.t_status=='in-progress')\
+                        .filter(Map_users_proj.users_role=='manager')\
+                        .one()
+        assignedTickets = assignedTickets[0]
+
+        #Query to get average time for ticket completion
+        sql = text(""" select cast(avg_ticket_time as INTEGER)
+                from (select avg(diff) as avg_ticket_time 
+                from (select (to_date(t_close_date,'DD/MM/YYYY') - to_date(t_create_date,'DD/MM/YYYY')) as diff 
+                from ticket where t_status='closed' AND p_id= """ + str(project_id) + """)x)y; """)
+        timePerTicket = db.session.execute(sql)
+        timePerTicket = [row for row in timePerTicket]
+        timePerTicket = timePerTicket[0][0]
+
+    data = {
+        'openTickets': openTickets,
+        'unassignedTickets': unassignedTickets,
+        'assignedTickets': assignedTickets,
+        'timePerTicket' : timePerTicket,        
+    }
+    return data
+
+
 @app.route('/manager/chart/<int:project_id>')
-def get_bar_pie_chart(project_id):
+def get_bar_chart(project_id):
     userInfo = session.get('userProfile', 'not set')
     if project_id==0:
         sql = text(""" SELECT mapid.mth_name          AS month, 

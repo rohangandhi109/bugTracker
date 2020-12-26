@@ -28,12 +28,49 @@ function number_format(number, decimals, dec_point, thousands_sep) {
 }
 
 function change_project() {
-  get_project(document.getElementById("project_id").value)
+  var project_id = document.getElementById("project_id").value
+  get_project(project_id)
+  set_card(project_id)
+  
 }
 
 $(document).ready(function () {
   get_project(0)
+  set_card(0)
 });
+
+function set_card(project_id) {
+  
+  $.ajax({
+    url: 'http://127.0.0.1:5000/manager/card/' + project_id,
+    type: 'GET',
+    dataType: 'json',
+    success: (data) => {
+
+      $('#openTickets').html(JSON.stringify(data.openTickets))
+      $('#unassignedTickets').html(JSON.stringify(data.unassignedTickets))
+      $('#assignedTickets').html(JSON.stringify(data.assignedTickets))
+      if (data.timePerTicket != null)
+        $('#timePerTicket').html(JSON.stringify(data.timePerTicket))
+      else
+      $('#timePerTicket').html('-')
+
+      $('#unassignedTicketsDiv').remove()
+      style_width = (data.unassignedTickets / data.openTickets) * 100;
+      var div = '<div id="unassignedTicketsDiv" class="progress-bar bg-warning" style="width:'+style_width +'%" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>'
+      $('#unassignedup').append(div);
+      
+
+      $('#assignedTicketsDiv').remove()
+      style_width = (data.assignedTickets / data.openTickets) * 100;
+      var div2 = '<div id="assignedTicketsDiv" class="progress-bar bg-info" style="width:'+style_width +'%" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>'
+      $('#assignedup').append(div2);
+      
+
+      
+    }
+  });
+}
 
 function get_project(project_id) {
   $.ajax({

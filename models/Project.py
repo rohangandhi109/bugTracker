@@ -25,6 +25,12 @@ class Project(db.Model):
         'start_date': self.p_start_date,
         'end_date' : self.p_end_date
         }
+
+    def json_format(self):
+        return{
+            'p_id': self.p_id,
+            'p_name': self.p_name
+        }
     
     def insert(self):
         db.session.add(self)
