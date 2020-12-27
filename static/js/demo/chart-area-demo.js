@@ -96,8 +96,8 @@ function get_project_pie(project_id) {
           labels: datalabels,
           datasets: [{
             data: datasets,
-            backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
-            hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
+            backgroundColor: ['#1cc88a', '#4e73df', '#36b9cc'],
+            hoverBackgroundColor: ['#17a673', '#2e59d9', '#2c9faf'],
             hoverBorderColor: "rgba(234, 236, 244, 1)",
           }],
         },
@@ -115,9 +115,9 @@ function get_project_pie(project_id) {
           },
           legend: {
             display: true,
-            position: 'bottom'
+            position: 'right'
           },
-          cutoutPercentage: 80,
+          cutoutPercentage: 75,
         },
       });
     }
@@ -227,7 +227,7 @@ function get_project_chart(project_id) {
           },
           legend: {
             display: true,
-            position: 'bottom'
+            position: 'right'
           },
           tooltips: {
             backgroundColor: "rgb(255,255,255)",

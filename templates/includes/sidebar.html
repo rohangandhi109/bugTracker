@@ -4,9 +4,8 @@
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
                 <div class="sidebar-brand-icon rotate-n-15">
-                    <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">Welcome </div>
+                <div class="sidebar-brand-text mx-3">Welcome, {{ data.user_name }} </div>
             </a>
 
             <!-- Divider -->
@@ -17,7 +16,12 @@
             <li class="nav-item ml-5">
                 <a class="nav-link" href="/{{ data.role }}/dashboard">
                     <i class="fas fa-users"></i>
-                  <span>Dashboard</span></a>
+                    {% if data.page=="dashboard" %}
+                        <span style="color:white;"><b>Dashboard</b></span>
+                    {% else %}
+                        <span>Dashboard </span>
+                    {% endif %}
+                </a>
             </li>
             {% endif %}
             
@@ -25,19 +29,34 @@
             <li class="nav-item ml-5">
                 <a class="nav-link" href="/{{ data.role }}/users">
                     <i class="fas fa-users"></i>
-                  <span>Users</span></a>
+                    {% if data.page=="users" %}
+                        <span style="color:white;"><b>Users</b></span>
+                    {% else %}
+                        <span>Users</span>
+                    {% endif %}
+                </a>
             </li>
             {% endif %}
             <li class="nav-item ml-5">
                 <a class="nav-link" href="/{{ data.role }}/tickets">
                     <i class="fas fa-fw fa-table"></i>
-                  <span>Tickets</span></a>
+                    {% if data.page=="tickets" or data.page=="ticket_detail" %}
+                        <span style="color:white;"><b>Tickets</b></span>
+                    {% else %}
+                        <span>Tickets</span>
+                    {% endif %}
+                </a>
             </li>
             {% if data.role != "user" %}
             <li class="nav-item ml-5">
                 <a class="nav-link" href="/{{ data.role }}/projects">
                     <i class="fa fa-cubes"></i>
-                  <span>Projects</span></a>
+                    {% if data.page=="projects" or data.page=="project_detail" %}
+                        <span style="color:white;"><b>Projects</b></span>
+                    {% else %}
+                        <span>Projects</span>
+                    {% endif %}
+                </a>
             </li>
             {% endif %}
 

@@ -121,8 +121,8 @@
                     </div>
                     <div class="card shadow">
                         <div class="select-project-class mt-2">
-                            <select style="width: 10rem;" id="project_id" onchange="change_project()">
-                                    <option value="0" selected="selected" >ALL</option>
+                            <select class="btn btn-primary" style="width: 15rem; height: 2rem;" id="project_id" onchange="change_project()">
+                                    <option value="0" selected="selected" >All Projects</option>
                                 {% for pro in data.project %}
                                     <option value={{ pro.p_id }} >{{ pro.p_name }}</option>
                                 {% endfor %}
@@ -155,7 +155,7 @@
                                     <!-- Card Body -->
                                     <div class="card-body">
                                         <div class="chart-pie" id="pie-area" >
-                                            <canvas id="myPieChart"></canvas>
+                                            <canvas style="width: 400px; height: 300px;" id="myPieChart"></canvas>
                                         </div>
                                     </div>
                                 </div>

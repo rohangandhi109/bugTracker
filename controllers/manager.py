@@ -26,7 +26,8 @@ def manager_dashboard():
         'project': project,
         'notify': notification.notify(userInfo['id']),
         'page': 'dashboard',
-        'role':userInfo['role']
+        'role':userInfo['role'],
+        'user_name': userInfo['name']
     }
     return render_template('dashboard.html',data=data)
 
