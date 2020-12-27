@@ -3,6 +3,7 @@ import math
 from app import app,db
 from flask import abort,session,render_template,redirect,url_for,jsonify
 from sqlalchemy import func,text
+from datetime import datetime
 
 from models.Ticket import Ticket
 from models.Project import Project
@@ -125,37 +126,45 @@ def get_four_card(project_id):
 @app.route('/manager/chart/<int:project_id>')
 def get_bar_chart(project_id):
     userInfo = session.get('userProfile', 'not set')
+    month_now = str(datetime.now().month)
+    year_now = str(datetime.now().year)
     if project_id==0:
         sql = text(""" SELECT mapid.mth_name          AS month, 
-                        proj.p_name                 AS name,
-                            mapid.p_id              AS p_id, 
-                            COALESCE(filter.cnt, 0) AS cnt 
-                        FROM   (SELECT  config.mth_name, 
+                                proj.p_name         AS name,
+                               mapid.p_id              AS p_id, 
+                                COALESCE(filter.cnt, 0) AS cnt 
+                            FROM   (SELECT config.mth_name, 
                                         config.mth_id, 
+										config.mth_year,
                                         proj.p_id 
-                                FROM   month_config config 
-                                    CROSS JOIN (SELECT p_id 
-                                                FROM   map_users_proj 
-                                                WHERE  users_id = 6 
-                                                    AND users_role = 'manager') proj) mapid 
-                        LEFT JOIN (SELECT Count(filter.t_id)              AS cnt, 
-                                        filter.p_id, 
-                                        Date_part('month', filter.date) AS month 
-                                    FROM   (SELECT  tick.t_id, 
-                                                    tick.p_id, 
-                                                    To_date(tick.t_create_date, 'DD/MM/YYYY') AS 
-                                                    date 
-                                            FROM   ticket tick 
-                                            WHERE  p_id IN (SELECT p_id 
-                                                            FROM   map_users_proj 
-                                                            WHERE 
-                                                            users_id = """ + str(userInfo['id']) + """ 
-                                                            AND users_role = 'manager')) filter 
-                                    GROUP  BY filter.p_id, 
-                                            Date_part('month', filter.date)) filter 
-                        ON mapid.mth_id = filter.month 
-                            AND mapid.p_id = filter.p_id
-                            INNER JOIN project proj on mapid.p_id = proj.p_id;  """)
+                                    FROM   (select * from month_config where id <= (select id from month_config where mth_id = """+ month_now + """ and mth_year= """+ year_now + """) and id >= (select id - 11 from month_config where mth_id = """ + month_now + """ and mth_year= """+ year_now +""")) config 
+                                        CROSS JOIN (SELECT p_id 
+                                                    FROM   map_users_proj 
+                                                    WHERE  users_id = """+  str(userInfo['id']) +"""
+                                                            AND users_role = 'manager') proj) mapid 
+                                LEFT OUTER JOIN (SELECT Count(filter.t_id)              AS cnt, 
+                                                        filter.p_id, 
+                                                        Date_part('month', filter.date) AS month ,
+														Date_part('year', filter.date) AS yr
+                                                    FROM   (SELECT tick.t_id, 
+                                                                tick.p_id, 
+                                                                To_date(tick.t_create_date, 'DD/MM/YYYY') 
+                                                                AS 
+                                                                date 
+                                                            FROM   ticket tick 
+                                                            WHERE  p_id IN (SELECT p_id 
+                                                                            FROM   map_users_proj 
+                                                                            WHERE 
+                                                                users_id = """+  str(userInfo['id']) +"""
+                                                                AND users_role = 
+                                                                    'manager')) filter 
+                                                    GROUP  BY filter.p_id, 
+                                                            Date_part('month', filter.date),
+															Date_part('year', filter.date)) filter 
+                                                ON mapid.mth_id = filter.month 
+												AND mapid.mth_year = filter.yr
+                                                AND mapid.p_id = filter.p_id
+                                                INNER JOIN project proj on mapid.p_id = proj.p_id;  """)
 
         chart_data = db.session.execute(sql)
         chart_data =  [MonthConfig.format(row) for row in chart_data]
@@ -165,37 +174,97 @@ def get_bar_chart(project_id):
         }  
         return back_chart_data
     else:
-        sql = text(""" SELECT mapid.mth_name       AS month, 
-                        proj.p_name         AS name,
-                          mapid.p_id              AS p_id, 
-                          COALESCE(filter.cnt, 0) AS cnt 
-                    FROM   (SELECT  config.mth_name, 
-                                    config.mth_id, 
-                                    proj.p_id 
-                            FROM   month_config config 
-                                CROSS JOIN (SELECT """+ str(project_id) + """ as p_id) proj) mapid 
-                    LEFT JOIN (SELECT Count(filter.t_id)              AS cnt, 
-                                      filter.p_id, 
-                                      Date_part('month', filter.date) AS month 
-                                FROM   (SELECT  tick.t_id, 
-                                                tick.p_id, 
-                                                To_date(tick.t_create_date, 'DD/MM/YYYY') AS 
-                                                date 
-                                        FROM   ticket tick 
-                                        WHERE  p_id = """+ str(project_id) +""" ) filter 
-                                GROUP  BY filter.p_id, 
-                                        Date_part('month', filter.date)) filter 
-                    ON mapid.mth_id = filter.month 
-                    AND mapid.p_id = filter.p_id
-                    INNER JOIN project proj on mapid.p_id = proj.p_id;  """)
+        sql = text(""" SELECT mapid.mth_name          AS month, 
+                                proj.p_name         AS name,
+                               mapid.p_id              AS p_id, 
+                                COALESCE(filter.cnt, 0) AS cnt 
+                            FROM   (SELECT config.mth_name, 
+                                        config.mth_id, 
+										config.mth_year,
+                                        proj.p_id 
+                                    FROM   (select * from month_config where id <= (select id from month_config where mth_id = """+ month_now + """ and mth_year= """+ year_now + """) and id >= (select id - 11 from month_config where mth_id = """ + month_now + """ and mth_year= """+ year_now +""")) config 
+                                        CROSS JOIN (SELECT """+ str(project_id) + """ as p_id) proj) mapid 
+                                LEFT OUTER JOIN (SELECT Count(filter.t_id)              AS cnt, 
+                                                        filter.p_id, 
+                                                        Date_part('month', filter.date) AS month ,
+														Date_part('year', filter.date) AS yr
+                                                    FROM   (SELECT tick.t_id, 
+                                                                tick.p_id, 
+                                                                To_date(tick.t_create_date, 'DD/MM/YYYY') 
+                                                                AS 
+                                                                date 
+                                                            FROM   ticket tick 
+                                                            WHERE  p_id = """+ str(project_id) +""" ) filter
+                                                    GROUP  BY filter.p_id, 
+                                                            Date_part('month', filter.date),
+															Date_part('year', filter.date)) filter 
+                                                ON mapid.mth_id = filter.month 
+												AND mapid.mth_year = filter.yr
+                                                AND mapid.p_id = filter.p_id
+                                                INNER JOIN project proj on mapid.p_id = proj.p_id;   """)
         chart_data = db.session.execute(sql)
         chart_data =  [MonthConfig.format(row) for row in chart_data]   
         back_chart_data ={
             'chart_data': chart_data,
-            'totalProjects': math.trunc(len(chart_data)/12),
-            'project' : ['BugTrack']
+            'totalProjects': math.trunc(len(chart_data)/12)
         }   
         return back_chart_data
+
+@app.route('/manager/pie-chart/<int:project_id>')
+def get_pie_chart(project_id):
+    userInfo = session.get('userProfile', 'not set')
+    month_now = str(datetime.now().month)
+    year_now = str(datetime.now().year)
+    pie_data = {}
+    if project_id==0:
+        sql = text (""" select index.left_pri as priority, COALESCE(cnt,0) as cnt from
+                        (select 'Low' as left_pri union select 'Medium' union select 'High' )index
+                            left outer join
+                        (SELEct filter.t_priority as priority, count(*) as cnt from 
+                        (SELECT tick.t_id, 
+                        tick.p_id, 
+                        tick.t_priority,
+                        To_date(tick.t_create_date, 'DD/MM/YYYY') 
+                        AS 
+                        date 
+                    FROM   ticket tick 
+                    WHERE  p_id IN (SELECT p_id 
+                                    FROM   map_users_proj 
+                                    WHERE 
+                        users_id = """+  str(userInfo['id']) +"""
+                        AND users_role = 
+                            'manager')) filter 
+                    inner join
+                    (select * from month_config where id <= (select id from month_config where mth_id = """+ month_now + """ and mth_year= """+ year_now + """) and id >= (select id - 11 from month_config where mth_id = """+ month_now + """ and mth_year= """+ year_now + """))config
+                    on Date_part('month', filter.date) = config.mth_id and Date_part('year', filter.date)= config.mth_year
+                    group by filter.t_priority
+                    )tab on index.left_pri = tab.priority """)
+        pie_data = db.session.execute(sql)
+        pie_data =  [MonthConfig.pie_fromat(row) for row in pie_data]
+    else:
+        sql = text (""" select index.left_pri as priority, COALESCE(cnt,0) as cnt from
+                        (select 'Low' as left_pri union select 'Medium' union select 'High' )index
+                            left outer join
+                        (SELEct filter.t_priority as priority, count(*) as cnt from 
+                        (SELECT tick.t_id, 
+                        tick.p_id, 
+                        tick.t_priority,
+                        To_date(tick.t_create_date, 'DD/MM/YYYY') 
+                        AS 
+                        date 
+                    FROM   ticket tick 
+                    WHERE  p_id= """+ str(project_id) +""") filter 
+                    inner join
+                    (select * from month_config where id <= (select id from month_config where mth_id = """+ month_now + """ and mth_year= """+ year_now + """) and id >= (select id - 11 from month_config where mth_id = """+ month_now + """ and mth_year= """+ year_now + """))config
+                    on Date_part('month', filter.date) = config.mth_id and Date_part('year', filter.date)= config.mth_year
+                    group by filter.t_priority
+                    )tab on index.left_pri = tab.priority """)
+        
+        pie_data = db.session.execute(sql)
+        pie_data =  [MonthConfig.pie_fromat(row) for row in pie_data]
+
+    return jsonify(pie_data)
+
 
 @app.route('/manager/tickets')
 def get_manager_tickets():

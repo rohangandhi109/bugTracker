@@ -50,7 +50,6 @@ from controllers import user, developer,ticket,comment,project,Admin,manager
 def login():
     return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL, audience=AUTH0_AUDIENCE)
 
-
 @app.route('/callback')
 def callback_handling():
     auth0.authorize_access_token()

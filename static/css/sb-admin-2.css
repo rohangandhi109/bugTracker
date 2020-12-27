@@ -10832,7 +10832,7 @@ a:focus {
 
 @media (min-width: 768px) {
   .chart-pie {
-    height: calc(20rem - 43px) !important;
+    height: 20rem;
   }
 }
 

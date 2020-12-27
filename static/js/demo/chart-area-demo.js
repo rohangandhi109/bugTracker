@@ -29,14 +29,16 @@ function number_format(number, decimals, dec_point, thousands_sep) {
 
 function change_project() {
   var project_id = document.getElementById("project_id").value
-  get_project(project_id)
+  get_project_chart(project_id)
   set_card(project_id)
+  get_project_pie(project_id)
   
 }
 
 $(document).ready(function () {
-  get_project(0)
+  get_project_chart(0)
   set_card(0)
+  get_project_pie(0)
 });
 
 function set_card(project_id) {
@@ -72,7 +74,57 @@ function set_card(project_id) {
   });
 }
 
-function get_project(project_id) {
+function get_project_pie(project_id) {
+  $.ajax({
+    url: 'http://127.0.0.1:5000/manager/pie-chart/'+ project_id,
+    type: 'GET',
+    dataType: 'json',
+    success: (back_data) => {
+      var datalabels = []
+      var datasets = []
+
+      for ( i = 0; i < 3; i++){
+        datalabels.push(back_data[i].priority)
+        datasets.push(back_data[i].cnt)
+      }
+      $('#myPieChart').remove();
+      $('#pie-area').append('<canvas id="myPieChart"><canvas>');
+      var ctx = document.getElementById("myPieChart");
+      var myPieChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: datalabels,
+          datasets: [{
+            data: datasets,
+            backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+            hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
+            hoverBorderColor: "rgba(234, 236, 244, 1)",
+          }],
+        },
+        options: {
+          maintainAspectRatio: false,
+          tooltips: {
+            backgroundColor: "rgb(255,255,255)",
+            bodyFontColor: "#858796",
+            borderColor: '#dddfeb',
+            borderWidth: 1,
+            xPadding: 15,
+            yPadding: 15,
+            displayColors: false,
+            caretPadding: 10,
+          },
+          legend: {
+            display: true,
+            position: 'bottom'
+          },
+          cutoutPercentage: 80,
+        },
+      });
+    }
+  })
+}
+
+function get_project_chart(project_id) {
   $.ajax({
     url: 'http://127.0.0.1:5000/manager/chart/'+ project_id,
     type: 'GET',
@@ -82,12 +134,15 @@ function get_project(project_id) {
       var color2 = 10
       var color3 = 28
       var datasets = [];
+      var month_name = [];
       var increment = 255/back_data.totalProjects 
       var j = 0;
       for (i = 0; i < back_data.totalProjects; i++) { 
         var datalabels = []
         for (j = j; j < (12 + ( 12 * i))  ; j++) {
           datalabels.push(back_data.chart_data[j].cnt)
+          if(i==0)
+            month_name.push(back_data.chart_data[j].month)
         }
         color1 += (i * increment)
         color2 += (i * increment)
@@ -117,7 +172,7 @@ function get_project(project_id) {
       var myLineChart = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ["Jan", "Feb", "Mar", "Apr", "May", "jun", "jul", "aug", "sep", "oct", "nov", "dec"],
+          labels: month_name,
           datasets: datasets,
         },
         options: {
