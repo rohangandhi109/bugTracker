@@ -5,8 +5,8 @@ from sqlalchemy.orm import load_only
 class Ticket(db.Model):
     
     t_id = db.Column(db.Integer, primary_key=True)
-    t_title = db.Column(db.String(20))
-    t_desc = db.Column(db.String(100))
+    t_title = db.Column(db.String)
+    t_desc = db.Column(db.String)
     users_id = db.Column(db.Integer)
     submitter_email = db.Column(db.String)
     p_id = db.Column(db.Integer)
@@ -16,7 +16,8 @@ class Ticket(db.Model):
     t_create_date = db.Column(db.String) 
     t_close_date = db.Column(db.String)
 
-    def __init__(self, t_title, t_desc, users_id, submitter_email, p_id, t_priority, t_status, t_type,t_create_date, t_close_date):
+    def __init__(self, t_id,t_title, t_desc, users_id, submitter_email, p_id, t_priority, t_status, t_type,t_create_date, t_close_date):
+        self.t_id = t_id
         self.t_title = t_title
         self.t_desc = t_desc
         self.users_id = users_id

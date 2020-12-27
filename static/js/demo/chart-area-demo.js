@@ -135,7 +135,7 @@ function get_project_chart(project_id) {
       var color3 = 28
       var datasets = [];
       var month_name = [];
-      var increment = 255/back_data.totalProjects 
+      var increment = 255/back_data.totalProjects - 40 
       var j = 0;
       for (i = 0; i < back_data.totalProjects; i++) { 
         var datalabels = []

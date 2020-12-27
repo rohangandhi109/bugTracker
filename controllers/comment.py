@@ -1,9 +1,12 @@
-from app import app
+import sys
+from datetime import datetime
 from flask import redirect,request,session,abort
+
+from app import app
+
 from models.Comment import Comment
 from models.Users import Users
-from datetime import datetime
-import sys
+
 
 @app.route('/add-comment',methods=['POST'])
 def add_comment():

@@ -1,9 +1,10 @@
 import numpy as np
 import math
-from app import app,db
+from datetime import datetime
 from flask import abort,session,render_template,redirect,url_for,jsonify
 from sqlalchemy import func,text
-from datetime import datetime
+
+from app import app,db
 
 from models.Ticket import Ticket
 from models.Project import Project

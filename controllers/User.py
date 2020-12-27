@@ -3,13 +3,15 @@
 # 1. View all submitted tickets     /user/tickets       only user can access                    #
 #################################################################################################
 
+import sys
+from datetime import date
+from flask import abort, request,render_template,redirect,url_for,session
+
 from app import app
+
 from models.Ticket import Ticket
 from models.Project import Project
 from models.Users import Users
-from flask import abort, request,render_template,redirect,url_for,session
-import sys
-from datetime import date
 
 ################################### View All Tickets ##############################################
 # Endpoint fetches all the tickets submitted by the user                                          #

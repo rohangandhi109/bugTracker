@@ -25,19 +25,26 @@
                     <a href="/user-form" class="btn btn-info btn-icon-split">
                         <span class="text">Add User</span>
                     </a>
-
                     <hr>
                     <div>
                         {% include '/includes/usersTable.html' %}
                     </div>
                     
                     {% endif %}
+                    {% if data.role=="admin" and data.page=="projects" %}
+                        <a href="/project-form" class="btn btn-info btn-icon-split">
+                            <span class="text">Create Project</span>
+                        </a>
+                        <br>
+                    {% endif %}
 
                     {% if data.page == "tickets" %}
                     <!-- Page Heading -->
-                        <a href="/ticket-form?edit=false" class="btn btn-info btn-icon-split">
-                            <span class="text">Create Ticket</span>
-                        </a>
+                        {% if data.role!="admin" %}
+                            <a href="/ticket-form?edit=false" class="btn btn-info btn-icon-split">
+                                <span class="text">Create Ticket</span>
+                            </a>
+                        {% endif %}
                         {% if data.role == "dev" %}
                             <a href="/dev/tickets" class="btn btn-info btn-icon-split">
                                 <span class="text">All Ticket</span>

@@ -6,8 +6,12 @@
 # 4. assign a ticket to dev             /dev/assign-ticket          -> only dev can access          #
 # 5. dev's project                      /dev/projects               -> only dev can access          #
 #####################################################################################################
+import sys
+from datetime import date
+from flask import abort, render_template,session, request,redirect, url_for
 
 from app import app,db
+
 from models.Ticket import Ticket
 from models.Project import Project
 from models.Map_users_proj import Map_users_proj
@@ -15,10 +19,8 @@ from models.Ticket_history import Ticket_history
 from models.Notification import Notification
 from models.Comment import Comment
 from models.Users import Users
+
 from controllers import notification
-from flask import abort, render_template,session, request,redirect, url_for
-from datetime import date
-import sys
 
 ###################### Fetch tickets of all the project dev belongs #############################
 # Endpoints generates a list tickets of all projects the dev belong to                          #

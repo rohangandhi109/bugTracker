@@ -1,16 +1,19 @@
 <div class="row">
     {% for p in data.project %}
-        <div class="detailcard shadow mb-4 mr-2 ml-2">
+        <div class="detailcard shadow mt-3 mb-4 mr-2 ml-2">
             <div class="card-header py-3">
                 <h4 class="m-0 font-weight-bold text-primary">
-                <a href="/project-details/{{ p.id }}">{{ p.name }}</h4>
+                    <a href="/project-details/{{ p.id }}">{{ p.name }}</a>
+                </h4>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <h6 class="font-weight-lighter font-italic">{{ p.desc }}</h6>
-                    <br>
-                    <h5><b> Project Manager </b></h5>
-                    <h6> Bob </h6>
+                    {% if data.role=="admin" %}
+                        <br>
+                        <h5><b> Project Manager: </b></h5>
+                        <h6> {{ p.end_date }} </h6>
+                    {% endif %}
                 </div>
             </div>
         </div>

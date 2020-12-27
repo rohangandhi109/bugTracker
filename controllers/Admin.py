@@ -1,11 +1,13 @@
-from app import app
+import sys
+from datetime import date
+from flask import render_template,session,request,abort,redirect,url_for
+from sqlalchemy import text,func
+from app import app,db
+
 from models.Users import Users
 from models.Project import Project
 from models.Ticket import Ticket
 from models.Map_users_proj import Map_users_proj
-from flask import render_template,session,request,abort,redirect,url_for
-from datetime import date
-import sys
 
 @app.route('/admin/users')
 def get_all_users():
@@ -48,9 +50,12 @@ def add_user():
     email = request.form.get('email', '')
     role = request.form.get('role', '')
     create_date = date.today().strftime("%d/%m/%Y")
-    print(name)
-    user = Users(email,name,name,role,create_date)
-    print('done')
+    
+    new_id = db.session.query(func.max(Users.users_id))
+    if new_id[0][0] == None:
+        new_id[0][0]=0
+
+    user = Users(new_id[0][0]+1,email,name,name,role,create_date)
     try:
         user.insert()
     except:
@@ -76,14 +81,16 @@ def get_user_history(Id):
 
     # Get the tickets of the user/dev/manager
     ticket = ""
-    if user['role']=='user':
+    #user submitted tickets
+    if user['role']=='user' or user['role']=='manager':
         ticket = Ticket.query.join(Project, Ticket.p_id==Project.p_id)\
             .add_columns(Ticket.t_id.label('id'), Ticket.t_title.label('title'), Project.p_name.label('project'))\
                 .filter(Ticket.submitter_email==user['email'])
+    #Developer Assigned tickets
     elif user['role']=='dev':
         ticket = Ticket.query.join(Project, Ticket.p_id==Project.p_id)\
             .add_columns(Ticket.t_id.label('id'), Ticket.t_title.label('title'), Project.p_name.label('project'))\
-                .filter(Ticket.users_id==Id)
+            .filter(Ticket.users_id==Id)
 
     data = {
         'users' : [user],
@@ -162,9 +169,22 @@ def remove_project_user():
 def get_all_projects():
     userInfo = session.get('userProfile', 'not set')
     
-    project =Project.query.all()
-    project = [pro.format() for pro in project]
-    
+    sql=text(""" SELECT proj.p_id         AS p_id, 
+                                    proj.p_name       AS p_name, 
+                                    proj.p_desc       AS p_desc, 
+                                    proj.p_start_date AS p_start_date, 
+                                    man.users_name     AS p_end_date 
+                                FROM   project proj 
+                                    LEFT OUTER JOIN (SELECT map.p_id, 
+                                                            u.users_name 
+                                                        FROM   map_users_proj map 
+                                                            INNER JOIN users u 
+                                                                    ON map.users_id = u.users_id 
+                                                        WHERE  map.users_role = 'manager')man 
+                                                    ON proj.p_id = man.p_id """)
+                                                
+    project = db.session.execute(sql)
+    project = [Project.format(p) for p in project]
     data={
         'project' : project,
         'user_name': userInfo['name'],

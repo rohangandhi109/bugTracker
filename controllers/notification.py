@@ -6,10 +6,13 @@
 # 2. deletes a notification         Endpoint /delete-notification   accessed by Developers and Managers     #
 #############################################################################################################
 
-from models.Notification import Notification
-from app import app,db
-from flask import request,redirect,url_for
 import sys
+from flask import request,redirect,url_for
+
+from app import app
+
+from models.Notification import Notification
+
 
 ################## Fetch list of notification ###################################################
 # Function to fetch list of notification of a specific user                                     #

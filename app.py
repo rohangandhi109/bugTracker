@@ -4,12 +4,11 @@ from flask import Flask, redirect, jsonify,session,url_for,render_template
 from flask_sqlalchemy import SQLAlchemy
 from authlib.integrations.flask_client import OAuth
 from six.moves.urllib.parse import urlencode
-from info import *
 
+from info import *
 
 app = Flask(__name__)
 app.secret_key = "something"
-
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -44,6 +43,7 @@ from models.Ticket_history import Ticket_history
 from models.Notification import Notification
 from models.Comment import Comment
 from models.MonthConfig import MonthConfig
+
 from controllers import user, developer,ticket,comment,project,Admin,manager
 
 @app.route('/')

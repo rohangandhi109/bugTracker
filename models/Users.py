@@ -9,7 +9,8 @@ class Users(db.Model):
     users_role = db.Column(db.String)
     update_date = db.Column(db.String)
     
-    def __init__(self, users_email, users_name, users_password, users_role, update_date):
+    def __init__(self, users_id,users_email, users_name, users_password, users_role, update_date):
+        self.users_id = users_id
         self.users_email = users_email
         self.users_name = users_name
         self.users_password = users_password

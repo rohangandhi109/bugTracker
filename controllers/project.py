@@ -3,13 +3,44 @@
 #  1. Project details           /project-details/{project_id}           -> accessable to admin, Developer, Manager  #
 #####################################################################################################################
 
-from app import app
+import sys
+from datetime import date
+from flask import session, render_template,request,abort,redirect,url_for
+from sqlalchemy import func
+
+from app import app,db
+
 from models.Project import Project
 from models.Map_users_proj import Map_users_proj
 from models.Ticket import Ticket
 from models.Users import Users
-from flask import session, render_template
+
 from controllers import notification
+
+@app.route('/project-form')
+def get_project_form():
+    return render_template('project-form.html')
+
+@app.route('/create-project', methods=['POST'])
+def create_project():
+    userInfo = session.get('userProfile')
+    name = request.form.get('name', '')
+    desc = request.form.get('desc','')
+    start_date = date.today().strftime("%d/%m/%Y")
+
+    new_id = db.session.query(func.max(Project.p_id)).one()
+    print(new_id)
+    if new_id[0] == None:
+        new_id[0] = 0
+    project = Project(new_id[0] + 1,name,desc,start_date,'N/A')
+    try:
+        project.insert()
+    except:
+        print(sys.exc_info())
+        abort(500)
+
+    return redirect(url_for('get_all_projects'))
+
 
 ######################### Project Details #######################################################################
 # Endpoint is used to fetch the details of a specific project                                                   #

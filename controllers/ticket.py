@@ -7,19 +7,23 @@
 # 6. change ticket status   /change-status          only dev can access             #
 #####################################################################################
 
-from app import app,db
+import sys
+from datetime import date
+from sqlalchemy import func
+from flask import abort, request,render_template,redirect,url_for,session
+
 from info import STATUS, PRIORITY
+from app import app,db
+
 from models.Ticket import Ticket
 from models.Project import Project
 from models.Users import Users
 from models.Ticket_history import Ticket_history
 from models.Map_users_proj import Map_users_proj
 from models.Notification import Notification
-from controllers.notification import notify
 from models.Comment import Comment
-from flask import abort, request,render_template,redirect,url_for,session
-import sys
-from datetime import date
+
+from controllers.notification import notify
 
 ################################### Genrate ticket form #####################################
 # Endpoint generates a form for ticket                                                      #
@@ -71,10 +75,13 @@ def create_ticket():
     t_close_date = "N/A"
 
     ticketid =""
-   
+    new_id = db.session.query(func.max(Ticket.t_id))
+    if new_id[0][0] == None:
+        new_id=0
+
     # Genrate a new ticket
     if action=='new':
-        ticket = Ticket(t_title, t_desc, users_id, submitter_email, p_id, t_priority, 'open', t_type, t_create_date, t_close_date)
+        ticket = Ticket(new_id[0][0]+1,t_title, t_desc, users_id, submitter_email, p_id, t_priority, 'open', t_type, t_create_date, t_close_date)
         try:
             ticket.insert()
         except:
@@ -98,7 +105,7 @@ def create_ticket():
     if action=='update':
         ticketid = request.form.get('ticketid')
         ticket = Ticket.query.get(ticketid)
-        t_date = date.today().strftime("%d/%m/%Y")
+        t_date = t_create_date
         t_status = request.form.get('t_status')
         
         # status/priority changed add to ticket_history table
@@ -112,7 +119,7 @@ def create_ticket():
 
         # status=closed, update the close_date
         if ticket.t_status!='closed' and t_status=='closed':
-            ticket.t_close_date = date.today().strftime("%d/%m/%Y")
+            ticket.t_close_date = t_create_date
         
         # update the ticket in the ticket table
         ticket.t_title = t_title
