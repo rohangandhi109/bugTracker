@@ -7,7 +7,8 @@ class Comment(db.Model):
     date = db.Column(db.String)
     comment = db.Column(db.String)
     
-    def __init__(self, t_id, users_id, t_update_date, comment):
+    def __init__(self, c_id, t_id, users_id, t_update_date, comment):
+        self.c_id = c_id
         self.t_id = t_id
         self.users_id = users_id
         self.date = t_update_date

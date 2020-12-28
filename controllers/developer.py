@@ -9,8 +9,11 @@
 import sys
 from datetime import date
 from flask import abort, render_template,session, request,redirect, url_for
+from sqlalchemy import func
+
 
 from app import app,db
+from info import DATE
 
 from models.Ticket import Ticket
 from models.Project import Project
@@ -134,7 +137,10 @@ def assign_dev_ticket():
     ticket.update()
     
     #insert Ticket History of assign the Devloper
-    ticket_history = Ticket_history(ticket.t_id, ticket.users_id, ticket.t_status, date.today().strftime("%d/%m/%Y") , ticket.t_priority)
+    new_id = db.session.query(func.max(Ticket_history.id))
+    if new_id[0][0] == None:
+        new_id[0][0]=0
+    ticket_history = Ticket_history(new_id[0][0]+1,ticket.t_id, ticket.users_id, ticket.t_status, DATE , ticket.t_priority)
     try:
         ticket_history.insert()
     except:
@@ -145,7 +151,10 @@ def assign_dev_ticket():
     user1 = userInfo['id']
     user2 = Users.query.with_entities(Users.users_name).filter(Users.users_id == ticket.users_id).one()
     text = user2[0] + ' assigned to this ticket'
-    comment = Comment(ticket.t_id, user1, date.today().strftime("%d/%m/%Y"), text)
+    new_id = db.session.query(func.max(Comment.c_id))
+    if new_id[0][0] == None:
+        new_id[0][0]=0
+    comment = Comment(new_id[0][0]+1,ticket.t_id, user1, DATE, text)
     try:
         comment.insert()
     except:

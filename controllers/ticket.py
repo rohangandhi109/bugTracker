@@ -12,7 +12,7 @@ from datetime import date
 from sqlalchemy import func
 from flask import abort, request,render_template,redirect,url_for,session
 
-from info import STATUS, PRIORITY
+from info import STATUS, PRIORITY,DATE
 from app import app,db
 
 from models.Ticket import Ticket
@@ -33,13 +33,16 @@ from controllers.notification import notify
 
 @app.route('/ticket-form', methods=['GET'])
 def get_ticketForm():
+    userInfo = session.get('userProfile')
     edit = request.args.get('edit')
     ticket = ""
     if edit == 'true':
         ticket = Ticket.query.get(request.args.get('ticketid'))
 
-    project  = Project.query.all()
-    project = [tick.format() for tick in project]
+    project  = Project.query.join(Map_users_proj, Map_users_proj.p_id==Project.p_id).\
+                add_columns(Project.p_id.label('id'), Project.p_name.label('name')).\
+                filter(Map_users_proj.users_id==userInfo['id']).all()
+
     data = {
         'edit':edit,
         'ticket':ticket.format(),
@@ -71,13 +74,13 @@ def create_ticket():
     p_id = request.form.get('project')
     t_priority = request.form.get('t_priority','')
     t_type = request.form.get('t_type','')
-    t_create_date = date.today().strftime("%d/%m/%Y")
+    t_create_date = DATE
     t_close_date = "N/A"
 
     ticketid =""
     new_id = db.session.query(func.max(Ticket.t_id))
     if new_id[0][0] == None:
-        new_id=0
+        new_id[0][0]=0
 
     # Genrate a new ticket
     if action=='new':
@@ -90,8 +93,12 @@ def create_ticket():
         
         ticketid = ticket.t_id
 
-        # Add entry to history table 
-        ticket_history = Ticket_history(ticket.t_id,users_id,'open',t_create_date,t_priority)
+        # Add entry to history table
+        new_id = db.session.query(func.max(Ticket_history.id))
+        if new_id[0][0] == None:
+            new_id[0][0]=0
+ 
+        ticket_history = Ticket_history(new_id[0][0]+1,ticket.t_id,users_id,'open',t_create_date,t_priority)
         try:
             ticket_history.insert()
         except:
@@ -110,7 +117,11 @@ def create_ticket():
         
         # status/priority changed add to ticket_history table
         if ticket.t_status != t_status or ticket.t_priority!= t_priority:
-            ticket_history = Ticket_history(ticketid,ticket.users_id,t_status,t_date,t_priority)
+            new_id = db.session.query(func.max(Ticket_history.id))
+            if new_id[0][0] == None:
+                new_id[0][0]=0
+
+            ticket_history = Ticket_history(new_id[0][0],ticketid,ticket.users_id,t_status,t_date,t_priority)
             try:
                 ticket_history.insert()
             except:
@@ -183,7 +194,8 @@ def get_ticket_details(ticket_id):
     #Join comment, users on id to fetch user names.
     comment = Comment.query.join(Users, Comment.users_id==Users.users_id)\
                 .add_columns(Comment.t_id, Comment.comment, Comment.date, Users.users_name.label('users_id'))\
-                .filter(Comment.t_id==ticket_id).all()
+                .filter(Comment.t_id==ticket_id)\
+                .order_by(Comment.c_id.desc()).all()
     comment = [Comment.format(co) for co in comment]
 
     #Fetch all the people in the project
@@ -223,14 +235,18 @@ def change_ticket_status():
     ticket_id = request.form.get('ticketid')
     project_id = request.form.get('projectid')
     status = request.form.get('status')
-    t_date= date.today().strftime("%d/%m/%Y")
+    t_date= DATE
 
     # Fetch the ticket from the backend by the ticket_id
     ticket = Ticket.query.get(ticket_id)
     
     # if status changed that record it to ticket_history, notification table and add a comment
     if ticket.t_status != status:
-        ticket_history = Ticket_history(ticket_id,ticket.users_id,status,t_date,ticket.t_priority)
+        new_id = db.session.query(func.max(Ticket_history.id))
+        if new_id[0][0] == None:
+            new_id[0][0]=0
+
+        ticket_history = Ticket_history(new_id[0][0]+1,ticket_id,ticket.users_id,status,t_date,ticket.t_priority)
         try: 
             ticket_history.insert()
         except:
@@ -246,8 +262,12 @@ def change_ticket_status():
                 print(sys.exc_info())
                 abort(500)
         
-        comment = "Satus changed to :" + status + " by :" + userInfo['name']
-        comment = Comment(ticket_id,userInfo['id'],t_date,comment)
+        comment = "Status changed to " + status
+        new_id = db.session.query(func.max(Comment.c_id))
+        if new_id[0][0] == None:
+            new_id[0][0]=0
+
+        comment = Comment(new_id[0][0]+1,ticket_id,userInfo['id'],t_date,comment)
         try:
             comment.insert()
         except:

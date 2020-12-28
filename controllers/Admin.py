@@ -2,7 +2,9 @@ import sys
 from datetime import date
 from flask import render_template,session,request,abort,redirect,url_for
 from sqlalchemy import text,func
+
 from app import app,db
+from info import DATE
 
 from models.Users import Users
 from models.Project import Project
@@ -49,7 +51,7 @@ def add_user():
     name = request.form.get('name', '')
     email = request.form.get('email', '')
     role = request.form.get('role', '')
-    create_date = date.today().strftime("%d/%m/%Y")
+    create_date = DATE
     
     new_id = db.session.query(func.max(Users.users_id))
     if new_id[0][0] == None:
@@ -133,7 +135,7 @@ def assign_project():
     user_id=request.form.get('user_id')
     project_id = request.form.get('project')
     role = request.form.get('role')
-    assign_date = date.today().strftime("%d/%m/%Y")
+    assign_date = DATE
     action_type = request.form.get('type')
 
     if action_type=='Assign':
@@ -214,8 +216,11 @@ def remove_from_project():
 def get_all_tickets():
     userInfo = session.get('userProfile', 'not set')
     user_email=userInfo['email']
-    ticket = Ticket.query.all()
-    ticket = [Ticket.format(tick) for tick in ticket]
+    ticket = Ticket.query.join(Project, Project.p_id==Ticket.p_id)\
+        .add_columns(Ticket.t_id.label('id'), Ticket.t_title.label('title'), Ticket.t_desc.label('desc'), Ticket.t_priority.label('priority')
+        ,Ticket.t_status.label('status'), Project.p_name.label('p_id'), Ticket.t_create_date.label('create_date')\
+        , Ticket.t_close_date.label('close_date')).all()
+
     data={
         'ticket' : ticket,
         'user_name': userInfo['name'],

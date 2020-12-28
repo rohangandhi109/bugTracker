@@ -9,6 +9,7 @@ from flask import session, render_template,request,abort,redirect,url_for
 from sqlalchemy import func
 
 from app import app,db
+from info import DATE
 
 from models.Project import Project
 from models.Map_users_proj import Map_users_proj
@@ -26,7 +27,7 @@ def create_project():
     userInfo = session.get('userProfile')
     name = request.form.get('name', '')
     desc = request.form.get('desc','')
-    start_date = date.today().strftime("%d/%m/%Y")
+    start_date = DATE
 
     new_id = db.session.query(func.max(Project.p_id)).one()
     print(new_id)
@@ -64,7 +65,7 @@ def get_project_details(project_id):
 
     user = Users.query.join(Map_users_proj, Map_users_proj.users_id == Users.users_id)\
         .join(Project, Project.p_id == Map_users_proj.p_id)\
-            .add_columns(Users.users_name.label('name'),Users.users_email.label('email'),Map_users_proj.users_role.label('role'))\
+            .add_columns(Users.users_id.label('id'),Users.users_name.label('name'),Users.users_email.label('email'),Map_users_proj.users_role.label('role'))\
         .filter(Project.p_id == project_id).all()
     
     # Fetch the project records with primary key project_id
@@ -77,7 +78,6 @@ def get_project_details(project_id):
     if userInfo['role']=="admin":
         all_users = Users.query.all()
         all_users = [all.format() for all in all_users]
-
 
     data = {
         'users': user,

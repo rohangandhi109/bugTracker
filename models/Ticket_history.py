@@ -8,7 +8,8 @@ class Ticket_history(db.Model):
     t_update_date = db.Column(db.String)
     priority = db.Column(db.String)
     
-    def __init__(self, t_id, users_id, t_status, t_update_date, priority):
+    def __init__(self, id, t_id, users_id, t_status, t_update_date, priority):
+        self.id = id
         self.t_id = t_id
         self.users_id = users_id
         self.t_status = t_status
