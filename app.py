@@ -44,7 +44,7 @@ from models.Notification import Notification
 from models.Comment import Comment
 from models.MonthConfig import MonthConfig
 
-from controllers import user, developer,ticket,comment,project,Admin,manager,notification
+from controllers import userController, developer,ticket,comment,project,Admin,manager,notification
 
 @app.route('/')
 def login():
