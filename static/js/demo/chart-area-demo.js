@@ -36,8 +36,8 @@ function change_project() {
 }
 
 $(document).ready(function () {
-  set_card(0)
   get_project_chart(0)
+  set_card(0)
   get_project_pie(0)
 });
 
@@ -130,14 +130,10 @@ function get_project_chart(project_id) {
     type: 'GET',
     dataType: 'json',
     success: (back_data) => {
-      var color1 = 48
-      var color2 = 10
-      var color3 = 28
       var datasets = [];
       var month_name = [];
-      var increment = 255/back_data.totalProjects 
       var j = 0;
-      var array_color = ["#b2b266","#4e73df","#ff6666","#d2ff4d","#ffbb33","#adad85"]
+      var array_color = ["#b2b266", "#4e73df", "#ff6666", "#d2ff4d", "#ffbb33", "#adad85"];
       for (i = 0; i < back_data.totalProjects; i++) { 
         var datalabels = []
         for (j = j; j < (12 + ( 12 * i))  ; j++) {
@@ -145,15 +141,10 @@ function get_project_chart(project_id) {
           if(i==0)
             month_name.push(back_data.chart_data[j].month)
         }
-        color1 += (i * increment)
-        color2 += (i * increment)
-        color3 += (i * increment)
-        color_light = "rgba(" + color1 + "," + color2 + "," + color3 + ", 0)";
         color_dark = array_color[i]
         var some = {
           label: back_data.chart_data[j-1].name,
           lineTension: 0.3,
-          backgroundColor: color_light,
           borderColor: color_dark,
           pointRadius: 3,
           pointBackgroundColor: color_dark,
