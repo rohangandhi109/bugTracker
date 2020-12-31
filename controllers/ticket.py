@@ -104,44 +104,46 @@ def create_ticket():
         except:
             print(sys.exc_info())
             abort(500)
+    
 
     # Authorize Admin
+    if userInfo['role']=='admin':
+    
+        if action=='update':
+            ticketid = request.form.get('ticketid')
+            ticket = Ticket.query.get(ticketid)
+            t_date = t_create_date
+            t_status = request.form.get('t_status')
+            
+            # status/priority changed add to ticket_history table
+            if ticket.t_status != t_status or ticket.t_priority!= t_priority:
+                new_id = db.session.query(func.max(Ticket_history.id))
+                if new_id[0][0] == None:
+                    new_id[0][0]=0
 
+                ticket_history = Ticket_history(new_id[0][0],ticketid,ticket.users_id,t_status,t_date,t_priority)
+                try:
+                    ticket_history.insert()
+                except:
+                    print(sys.exc_info())
+                    abort(500)
 
-    # update ticket 
-    if action=='update':
-        ticketid = request.form.get('ticketid')
-        ticket = Ticket.query.get(ticketid)
-        t_date = t_create_date
-        t_status = request.form.get('t_status')
-        
-        # status/priority changed add to ticket_history table
-        if ticket.t_status != t_status or ticket.t_priority!= t_priority:
-            new_id = db.session.query(func.max(Ticket_history.id))
-            if new_id[0][0] == None:
-                new_id[0][0]=0
-
-            ticket_history = Ticket_history(new_id[0][0],ticketid,ticket.users_id,t_status,t_date,t_priority)
-            try:
-                ticket_history.insert()
-            except:
-                print(sys.exc_info())
-                abort(500)
-
-        # status=closed, update the close_date
-        if ticket.t_status!='closed' and t_status=='closed':
-            ticket.t_close_date = t_create_date
-        
-        # update the ticket in the ticket table
-        ticket.t_title = t_title
-        ticket.t_desc = t_desc
-        ticket.t_status = t_status
-        ticket.t_priority = t_priority
-        ticket.t_status = t_status
-        ticket.t_type = t_type 
-        
-        ticket.update()
-        ticketid = ticket.t_id
+            # status=closed, update the close_date
+            if ticket.t_status!='closed' and t_status=='closed':
+                ticket.t_close_date = t_create_date
+            
+            # update the ticket in the ticket table
+            ticket.t_title = t_title
+            ticket.t_desc = t_desc
+            ticket.t_status = t_status
+            ticket.t_priority = t_priority
+            ticket.t_status = t_status
+            ticket.t_type = t_type 
+            
+            ticket.update()
+            ticketid = ticket.t_id
+    else:
+        abort(401)
     
     # Fetch the people in the project
     project_user = Map_users_proj.query.with_entities(Map_users_proj.users_id).filter(Map_users_proj.p_id == p_id).all()
@@ -178,7 +180,21 @@ def get_ticket_details(ticket_id):
     userInfo = session.get('userProfile')
     
     # Fetch ticket record from tickets table
-    ticket = Ticket.query.get(ticket_id)
+    ticket = Ticket.query.join(Project, Project.p_id == Ticket.p_id)\
+                .join(Users, Users.users_id==Ticket.users_id)\
+                .add_columns(Ticket.t_id.label('id'),Ticket.users_id.label('user_id'),Users.users_name.label('user_name'),\
+                    Ticket.submitter_email.label('email'),Ticket.t_title.label('title'),Ticket.t_desc.label('desc'),\
+                    Ticket.t_priority.label('priority'),Ticket.t_type.label('type'),Ticket.t_status.label('status'),\
+                    Ticket.t_create_date.label('create_date'),Ticket.t_close_date.label('close_date'),\
+                    Project.p_name.label('p_id'),Ticket.p_id.label('project_id'))\
+                .filter(Ticket.t_id==ticket_id).all()
+
+    project_assigned = Map_users_proj.query.filter(Map_users_proj.users_id==userInfo['id'])\
+                        .filter(Map_users_proj.p_id==ticket[0][13]).all()
+    
+    if ticket[0][4] != userInfo['email'] and not project_assigned and userInfo['role'] !='admin':
+        abort(401)
+
     if not ticket:
         abort(404)
 
@@ -208,9 +224,10 @@ def get_ticket_details(ticket_id):
                 .filter(Ticket.t_id == ticket_id).filter(Users.users_role == 'dev').all()
 
     data = {
-        'ticket': [ticket.format()],
+        'ticket': ticket,
         'detail': detail,
         'role': userInfo['role'],
+        'id' : userInfo['id'],
         'user_name': userInfo['name'],
         'comment': comment,
         'page':'ticket_detail',

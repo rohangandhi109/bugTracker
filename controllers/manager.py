@@ -17,6 +17,9 @@ from controllers import notification
 @app.route('/manager/dashboard')
 def manager_dashboard():
     userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] != 'manager':
+        abort(401)
+
     project = Project.query.join(Map_users_proj, Map_users_proj.p_id == Project.p_id)\
                     .add_columns(Project.p_id, Project.p_name)\
                     .filter(Map_users_proj.users_id==userInfo['id'])\
@@ -35,6 +38,8 @@ def manager_dashboard():
 @app.route('/manager/card/<int:project_id>')
 def get_four_card(project_id):
     userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] != 'manager':
+        abort(401)
     openTickets = ""
     unassignedTickets = ""
     assignedTickets = ""
@@ -128,6 +133,8 @@ def get_four_card(project_id):
 @app.route('/manager/chart/<int:project_id>')
 def get_bar_chart(project_id):
     userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] != 'manager':
+        abort(401)
     month_now = str(datetime.now().month)
     year_now = str(datetime.now().year)
     if project_id==0:
@@ -215,6 +222,8 @@ def get_bar_chart(project_id):
 @app.route('/manager/pie-chart/<int:project_id>')
 def get_pie_chart(project_id):
     userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] != 'manager':
+        abort(401)
     month_now = str(datetime.now().month)
     year_now = str(datetime.now().year)
     pie_data = {}
@@ -273,6 +282,8 @@ def get_manager_tickets():
 
     #Authorize Manager
     userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] != 'manager':
+        abort(401)
     manager_email = userInfo['email']
     if userInfo['role'] != 'manager':
         abort(401)
@@ -300,6 +311,8 @@ def get_manager_tickets():
 @app.route('/manager/my-tickets')
 def get_manager_submitted_tickets():
     userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] != 'manager':
+        abort(401)
     user_email=userInfo['email']
     if userInfo['role'] != 'manager':
         abort(401)
@@ -324,4 +337,7 @@ def get_manager_submitted_tickets():
 
 @app.route('/manager/projects')
 def get_manager_project():
+    userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] != 'manager':
+        abort(401)
     return redirect(url_for('get_dev_project'))

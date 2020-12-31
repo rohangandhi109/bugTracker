@@ -28,8 +28,10 @@
                     {% if data.role!="admin"  %}
                         <div class="row">
                             <div class="detailcard shadow mb-4">
+                                {% if data.role!='user' and data.ticket[0].status != 'closed' %}
                                 <form action="/dev/assign-ticket" method="POST">
-                                    <label class="ml-3">Assign Developer:</label> 
+                                    <label class="ml-3">Assign Developer:</label>
+                                    <label>{{ data.ticket[0].status }}</label> 
                                     <br>
                                     
                                     {% for t in data.ticket %}
@@ -43,6 +45,9 @@
                                         </select>
                                     <button class="btn btn-info btn-icon-split" type="submit" style="width:5rem;">Assign</button>
                                 </form>
+                                {% else %}
+                                    <label class="ml-3"><b>Assigned Developer</b><br> {{ data.ticket[0].user_name }}</label>
+                                {% endif %}
                             </div>
                             <div class="detailcard shadow mb-4 ml-4">
                                 <form action="/add-comment" method="POST">
@@ -72,7 +77,9 @@
                                     <table class="table table-bordered" id="dataTable1" width="100%" cellspacing="0">
                                         <thead>
                                             <tr>
-                                                <th>Developer assigned</th>
+                                                {% if data.role!='user' %}
+                                                    <th>Developer assigned</th>
+                                                {% endif %}
                                                 <th>Status</th>
                                                 <th>Priority</th>
                                                 <th>Updated date</th>
@@ -81,7 +88,9 @@
                                         <tbody>
                                             {% for d in data.detail %}
                                             <tr>
-                                                <td>{{ d.users_id }}</td>
+                                                {% if data.role!='user' %}
+                                                    <td>{{ d.users_id }}</td>
+                                                {% endif %}
                                                 <td>{{ d.status }}</td>
                                                 <td>{{ d.priority }}</td>
                                                 <td>{{ d.update_date }}</td>

@@ -54,10 +54,20 @@ def get_project_details(project_id):
 
     userInfo = session.get('userProfile')
     
-    # Fetch all the tickets of the project with project_id
-    ticket = Ticket.query.filter(Ticket.p_id == project_id).all()
-    ticket = [tick.format() for tick in ticket]
+    project_assigned = Map_users_proj.query.filter(Map_users_proj.users_id==userInfo['id'])\
+                        .filter(Map_users_proj.p_id==project_id).all()
+    
+    if not project_assigned and userInfo['role'] != 'admin':
+        abort(401)
 
+    # Fetch all the tickets of the project with project_id
+    ticket = Ticket.query.join(Users, Users.users_id==Ticket.users_id)\
+                .add_columns(Ticket.t_id.label('id'),Ticket.users_id.label('user_id'),Users.users_name.label('user_name'),\
+                    Ticket.submitter_email.label('email'),Ticket.t_title.label('title'),Ticket.t_desc.label('desc'),\
+                    Ticket.t_priority.label('priority'),Ticket.t_type.label('type'),Ticket.t_status.label('status'),\
+                    Ticket.t_create_date.label('create_date'),Ticket.t_close_date.label('close_date'))\
+                    .filter(Ticket.p_id==project_id).all()
+    
     # Fetch the users info assigned to the project
     # join Users, map_users_proj on user_id
     # join map_users_proj, Project on project_id

@@ -41,13 +41,15 @@ def get_project_tickets():
 
     #Fetch query    
     ticket = Ticket.query.join(Map_users_proj, Map_users_proj.p_id==Ticket.p_id)\
-        .join(Users, Users.users_id==Map_users_proj.users_id)\
+            .join(Users, Users.users_id==Map_users_proj.users_id)\
             .join(Project, Project.p_id==Map_users_proj.p_id)\
-            .add_columns(Ticket.t_id.label('id'), Ticket.t_title.label('title'), Ticket.t_desc.label('desc'),\
-                Project.p_name.label('p_id'), Ticket.t_priority.label('priority'),\
-                Ticket.t_status.label('status'), Users.users_name.label('users_id'),\
-                Ticket.t_create_date.label('create_date'),Ticket.t_close_date.label('close_date'))\
-            .filter(Users.users_email==dev_email)
+            .add_columns(Ticket.t_id.label('id'),Users.users_name.label('user_name'),Ticket.submitter_email.label('email'),\
+                    Ticket.t_title.label('title'),Ticket.t_desc.label('desc'),Ticket.t_priority.label('priority'),\
+                    Ticket.t_type.label('type'),Ticket.t_status.label('status'),Ticket.t_create_date.label('create_date'),\
+                    Ticket.t_close_date.label('close_date'),Project.p_name.label('p_id'))\
+            .filter(Users.users_email==dev_email)\
+            .all()
+    
     data={
         'ticket' : ticket,
         'user_name': userInfo['name'],
@@ -73,8 +75,13 @@ def get_project_assigned_tickets():
         abort(401)
 
     # Fetch the tickets with same assigned developer id as the Developer    
-    ticket = Ticket.query.filter(Ticket.users_id==userInfo['id']).all()
-    ticket = ticket = [row.format() for row in ticket]
+    ticket = Ticket.query.join(Project, Project.p_id == Ticket.p_id)\
+                .join(Users, Users.users_id==Ticket.users_id)\
+                .add_columns(Ticket.t_id.label('id'),Users.users_name.label('user_name'),Ticket.submitter_email.label('email'),\
+                    Ticket.t_title.label('title'),Ticket.t_desc.label('desc'),Ticket.t_priority.label('priority'),\
+                    Ticket.t_type.label('type'),Ticket.t_status.label('status'),Ticket.t_create_date.label('create_date'),\
+                    Ticket.t_close_date.label('close_date'),Project.p_name.label('p_id'))\
+                .filter(Ticket.users_id==userInfo['id']).all()
     
     data={
         'ticket' : ticket,
@@ -103,12 +110,12 @@ def get_project_submitted_tickets():
 
     # Fetch the tickets with same user_email as the Developer    
     ticket = Ticket.query.join(Project, Project.p_id==Ticket.p_id)\
-            .add_columns(Ticket.t_id,Ticket.users_id,Ticket.submitter_email,\
-            Ticket.t_title,Ticket.t_desc,Ticket.t_priority,Ticket.t_type,\
-            Ticket.t_status,Ticket.t_create_date,Ticket.t_close_date,Project.p_name.label('p_id'))\
-            .filter(Ticket.submitter_email==user_email).order_by(Ticket.t_id.asc()).all()
-    ticket = [Ticket.format(tick) for tick in ticket]
-
+                .join(Users, Users.users_id==Ticket.users_id)\
+                .add_columns(Ticket.t_id.label('id'),Users.users_name.label('user_name'),Ticket.submitter_email.label('email'),\
+                    Ticket.t_title.label('title'),Ticket.t_desc.label('desc'),Ticket.t_priority.label('priority'),\
+                    Ticket.t_type.label('type'),Ticket.t_status.label('status'),Ticket.t_create_date.label('create_date'),\
+                    Ticket.t_close_date.label('close_date'),Project.p_name.label('p_id'))\
+    
 
     data={
         'ticket' : ticket,
@@ -131,6 +138,9 @@ def get_project_submitted_tickets():
 @app.route('/dev/assign-ticket',methods=['POST'])
 def assign_dev_ticket():
 
+    userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] !='dev':
+        abort(401)
     # Fetch the ticket that is to be assigned and assign the developer to it
     ticket = Ticket.query.get(request.form.get('ticket_id'))
     ticket.users_id = request.form.get('user_name')
@@ -180,6 +190,9 @@ def assign_dev_ticket():
 def get_dev_project():
     userInfo = session.get('userProfile', 'not set')
     dev_email = userInfo['email']
+
+    if userInfo['role'] !='dev' and userInfo['role'] != 'manager':
+        abort(401)
 
     #fetch list of projects that the Developer is assigned to using the map table
     #join Project, map_users_proj on project id

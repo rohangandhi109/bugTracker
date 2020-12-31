@@ -32,7 +32,7 @@
                         {% if data.page == "tickets" or data.page == 'project_detail' %}
                             <th> </th>
                         {% endif %}
-                        {% if data.page == "ticket_detail" %}
+                        {% if data.page == "ticket_detail" and data.role!='user' %}
                             <th> </th>
                         {% endif %}
                         
@@ -52,7 +52,11 @@
                         <td>{{ t.priority }}</td>
                         {% if data.page=="ticket_detail" and (data.role=="dev" or data.role=="manager" ) %}
                             <td>
-                                <button class="btn btn-info btn-icon-split" id="myBtn">{{ t.status }}</button>
+                                {% if user_id == data.ticket[0].id or data.ticket[0].status !='closed' %}
+                                    <button class="btn btn-info btn-icon-split" id="myBtn">{{ t.status }}</button>
+                                {% else %}
+                                    {{ t.status }}
+                                {% endif %}
                                 <div id="myModal" class="modal1">
                                     <div class="modal-content1">
                                         <form action="/change-status" method="POST">
@@ -79,7 +83,7 @@
                             <td>{{ t.status }}</td>
                         {% endif %}
                         {% if data.role == 'dev' or data.role=='manager' %}
-                            <td>{{ t.users_id }}</td>
+                            <td>{{ t.user_name }}</td>
                         {% endif %}
                         {% if data.page !='project_detail' %}
                             <td>{{ t.create_date }}</td>

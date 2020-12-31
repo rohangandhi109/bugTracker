@@ -44,7 +44,7 @@ from models.Notification import Notification
 from models.Comment import Comment
 from models.MonthConfig import MonthConfig
 
-from controllers import user, developer,ticket,comment,project,Admin,manager
+from controllers import user, developer,ticket,comment,project,Admin,manager,notification
 
 @app.route('/')
 def login():
@@ -82,27 +82,42 @@ def logout():
 
 @app.errorhandler(404)
 def error_404(error):
-    return jsonify({
-    'success': False,
-    'error': 404,
-    'message': 'Page not found'
-    }), 404
+    userInfo = session.get('userProfile', 'not set')
+    data = {
+        'user_name': userInfo['name'],
+        'role': userInfo['role'],
+        'page' : 'error',
+        'error' : '404',
+        'message': error,
+        'notify': notification.notify(userInfo['id']),
+    }
+    return render_template('error.html',data=data)
 
 @app.errorhandler(500)
 def error_500(error):
-    return jsonify({
-    'success': False,
-    'error': 500,
-    'message': 'Server side error'
-    }), 500
+    userInfo = session.get('userProfile', 'not set')
+    data = {
+        'user_name': userInfo['name'],
+        'role': userInfo['role'],
+        'page' : 'error',
+        'error' : '500',
+        'message': error,
+        'notify': notification.notify(userInfo['id']),
+    }
+    return render_template('error.html',data=data)
 
 @app.errorhandler(401)
 def error_401(error):
-    return jsonify({
-    'success': False,
-    'error': 401,
-    'message': 'unauthorized'
-    }), 401
+    userInfo = session.get('userProfile', 'not set')
+    data = {
+        'user_name': userInfo['name'],
+        'role': userInfo['role'],
+        'page' : 'error',
+        'error' : '401',
+        'message': error,
+        'notify': notification.notify(userInfo['id']),
+    }
+    return render_template('error.html',data=data)
 
 if __name__ == '__main__':
     app.run()

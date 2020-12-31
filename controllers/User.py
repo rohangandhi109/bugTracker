@@ -23,17 +23,17 @@ def get_tickets():
     userInfo = session.get('userProfile', 'not set')
     user_email=userInfo['email']
 
-    # AUthorize the user
+    # Authorize the user
     if userInfo['role'] != 'user':
         abort(401)
 
     # fetch list of tickets
     ticket = Ticket.query.join(Project, Project.p_id==Ticket.p_id)\
-            .add_columns(Ticket.t_id,Ticket.users_id,Ticket.submitter_email,\
-            Ticket.t_title,Ticket.t_desc,Ticket.t_priority,Ticket.t_type,\
-            Ticket.t_status,Ticket.t_create_date,Ticket.t_close_date,Project.p_name.label('p_id'))\
-            .filter(Ticket.submitter_email==user_email).order_by(Ticket.t_id.asc()).all()
-    ticket = [Ticket.format(tick) for tick in ticket]
+             .add_columns(Ticket.t_id.label('id'),Users.users_name.label('user_name'),Ticket.submitter_email.label('email'),\
+                    Ticket.t_title.label('title'),Ticket.t_desc.label('desc'),Ticket.t_priority.label('priority'),\
+                    Ticket.t_type.label('type'),Ticket.t_status.label('status'),Ticket.t_create_date.label('create_date'),\
+                    Ticket.t_close_date.label('close_date'),Project.p_name.label('p_id'))\
+            .filter(Ticket.submitter_email==user_email).all()
     data={
         'ticket' : ticket,
         'user_name': userInfo['name'],

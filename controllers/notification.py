@@ -7,7 +7,7 @@
 #############################################################################################################
 
 import sys
-from flask import request,redirect,url_for
+from flask import request,redirect,url_for,session,abort
 
 from app import app
 
@@ -37,6 +37,9 @@ def notify(id):
 
 @app.route('/delete-notification')
 def deleteNotification():
+    userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] !='dev' and userInfo['role'] != 'manager':
+        abort(401)
     ticket_id = request.args.get('ticket')
     notify_id = request.args.get('notify')
     notify = Notification.query.get(notify_id)

@@ -1,0 +1,53 @@
+{% include '/includes/head.html' %}
+
+    <title>{{ data.role }}</title>
+
+</head>
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+
+        {% include '/includes/sidebar.html' %}
+
+       <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+
+            <!-- Main Content -->
+            <div id="content">
+
+                {% include '/includes/topbar.html' %}
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    {% if data.error == '401' %}
+                        <h1> Unauthorized </h1>
+                        <b> {{data.message}} </b>
+                    {% elif data.error == '500' %}
+                        <h1>Server side error</h1>
+                        <b>{{data.message}}</b>
+                    {% elif data.error == '404' %}
+                        <h1>Page not found</h1>
+                        <b>{{data.message}}</b>
+                    {% endif %}
+                </div>
+                <!-- /.container-fluid -->
+
+            </div>
+            <!-- End of Main Content -->
+
+            {% include '/includes/footer.html' %}
+
+        </div>
+        <!-- End of Content Wrapper -->
+
+    </div>
+    <!-- End of Page Wrapper -->
+    {% include '/includes/logout.html' %}
+
+    {% include '/includes/jsimport.html' %}
+   
+</body>
+
+</html>

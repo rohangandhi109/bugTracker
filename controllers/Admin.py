@@ -14,6 +14,8 @@ from models.Map_users_proj import Map_users_proj
 @app.route('/admin/users')
 def get_all_users():
     userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] !='admin':
+        abort(401)
     users = Users.query.filter(Users.users_role!="admin").all()
     users = [u.format() for u in users ]
     data = {
@@ -27,6 +29,9 @@ def get_all_users():
 
 @app.route('/user-form')
 def get_user_form():
+    userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] !='admin':
+        abort(401)
     edit = request.args.get('edit','')
     userid = request.args.get('userid','')
     data =""
@@ -47,7 +52,9 @@ def get_user_form():
 
 @app.route('/add-user',methods=['POST'])
 def add_user():
-    userInfo = session.get('userProfile')
+    userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] !='admin':
+        abort(401)
     name = request.form.get('name', '')
     email = request.form.get('email', '')
     role = request.form.get('role', '')
@@ -68,6 +75,8 @@ def add_user():
 @app.route('/user-history/<int:Id>')
 def get_user_history(Id):
     userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] !='admin':
+        abort(401)
     # Get user details
     user = Users.query.get(Id)
     user = user.format()
@@ -107,6 +116,9 @@ def get_user_history(Id):
 
 @app.route('/delete-user')
 def delete_user():
+    userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] !='admin':
+        abort(401)
     userid = request.args.get('userid','')
     user = Users.query.get(userid)
     try:
@@ -119,7 +131,9 @@ def delete_user():
 
 @app.route('/edit-user',methods=['POST'])
 def edit_user():
-    userInfo = session.get('userProfile')
+    userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] !='admin':
+        abort(401)
     id=request.form.get('id')
     user_update = Users.query.get(id)
 
@@ -132,6 +146,9 @@ def edit_user():
 
 @app.route('/assign-project', methods=['POST'])
 def assign_project():
+    userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] !='admin':
+        abort(401)
     user_id=request.form.get('user_id')
     project_id = request.form.get('project')
     role = request.form.get('role')
@@ -158,6 +175,7 @@ def assign_project():
 
 @app.route('/user-remove-project')
 def remove_user_from_project():
+    
     data = remove_from_project()
     return redirect('/user-history/'+data['user_id'])
 
@@ -170,6 +188,8 @@ def remove_project_user():
 @app.route('/admin/projects')
 def get_all_projects():
     userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] !='admin':
+        abort(401)
     
     sql=text(""" SELECT proj.p_id         AS p_id, 
                                     proj.p_name       AS p_name, 
@@ -197,6 +217,9 @@ def get_all_projects():
 
 
 def remove_from_project():
+    userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] !='admin':
+        abort(401)
     user_id = request.args.get('userid')
     project_id = request.args.get('projectid')
     map = Map_users_proj.query.filter(Map_users_proj.p_id==project_id).filter(Map_users_proj.users_id==user_id).one()
@@ -215,6 +238,8 @@ def remove_from_project():
 @app.route('/admin/tickets')
 def get_all_tickets():
     userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] !='admin':
+        abort(401)
     user_email=userInfo['email']
     ticket = Ticket.query.join(Project, Project.p_id==Ticket.p_id)\
         .add_columns(Ticket.t_id.label('id'), Ticket.t_title.label('title'), Ticket.t_desc.label('desc'), Ticket.t_priority.label('priority')
@@ -231,6 +256,9 @@ def get_all_tickets():
 
 @app.route('/delete-ticket/<int:id>')
 def delete_ticket(id):
+    userInfo = session.get('userProfile', 'not set')
+    if userInfo['role'] !='admin':
+        abort(401)
     ticket = Ticket.query.get(id)
     try:
         ticket.delete()
