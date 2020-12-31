@@ -25,11 +25,11 @@ def after_request(response):
 
 auth0 = oauth.register(
     'auth0',
-    client_id = os.environ['AUTH0_CLIENT_ID'],
-    client_secret = os.environ['AUTH0_CLIENT_SECRET'],
-    api_base_url = os.environ['AUTH0_BASE_URL'],
-    access_token_url =os.environ['AUTH0_BASE_URL'] + '/oauth/token',
-    authorize_url = os.environ['AUTH0_BASE_URL'] + '/authorize',
+    client_id = AUTH0_CLIENT_ID,
+    client_secret = AUTH0_CLIENT_SECRET,
+    api_base_url = AUTH0_BASE_URL,
+    access_token_url =AUTH0_BASE_URL + '/oauth/token',
+    authorize_url = AUTH0_BASE_URL + '/authorize',
     client_kwargs={
         'scope': 'openid profile email',
     },
@@ -48,7 +48,7 @@ from controllers import userController, developer,ticket,comment,project,Admin,m
 
 @app.route('/')
 def login():
-    return auth0.authorize_redirect(redirect_uri=os.environ['AUTH0_CALLBACK_URL'], audience=os.environ['AUTH0_AUDIENCE'])
+    return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL, audience=AUTH0_AUDIENCE)
 
 @app.route('/callback')
 def callback_handling():
@@ -76,7 +76,7 @@ def temp():
 @app.route('/logout')
 def logout():
     session.clear()
-    params = {'returnTo': url_for('login', _external=True), 'client_id': os.environ['AUTH0_CLIENT_ID']}
+    params = {'returnTo': url_for('login', _external=True), 'client_id': AUTH0_CLIENT_ID}
     return redirect(auth0.api_base_url + '/v2/logout?' + urlencode(params))
 
 
