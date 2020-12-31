@@ -1,5 +1,5 @@
-import sys
-
+import sys,os
+from os import environ as env
 from flask import Flask, redirect, jsonify,session,url_for,render_template
 from flask_sqlalchemy import SQLAlchemy
 from authlib.integrations.flask_client import OAuth
@@ -9,7 +9,7 @@ from info import *
 
 app = Flask(__name__)
 app.secret_key = "something"
-app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -25,11 +25,11 @@ def after_request(response):
 
 auth0 = oauth.register(
     'auth0',
-    client_id=AUTH0_CLIENT_ID,
-    client_secret=AUTH0_CLIENT_SECRET,
-    api_base_url=AUTH0_BASE_URL,
-    access_token_url=AUTH0_BASE_URL + '/oauth/token',
-    authorize_url=AUTH0_BASE_URL + '/authorize',
+    client_id = os.environ['AUTH0_CLIENT_ID'],
+    client_secret = os.environ['AUTH0_CLIENT_SECRET'],
+    api_base_url = os.environ['AUTH0_BASE_URL'],
+    access_token_url =os.environ['AUTH0_BASE_URL'] + '/oauth/token',
+    authorize_url = os.environ['AUTH0_BASE_URL'] + '/authorize',
     client_kwargs={
         'scope': 'openid profile email',
     },
