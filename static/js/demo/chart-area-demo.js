@@ -44,7 +44,7 @@ $(document).ready(function () {
 function set_card(project_id) {
   
   $.ajax({
-    url: 'http://127.0.0.1:5000/manager/card/' + project_id,
+    url: '/manager/card/' + project_id,
     type: 'GET',
     dataType: 'json',
     success: (data) => {
@@ -76,7 +76,7 @@ function set_card(project_id) {
 
 function get_project_pie(project_id) {
   $.ajax({
-    url: 'http://127.0.0.1:5000/manager/pie-chart/'+ project_id,
+    url: '/manager/pie-chart/'+ project_id,
     type: 'GET',
     dataType: 'json',
     success: (back_data) => {
@@ -126,7 +126,7 @@ function get_project_pie(project_id) {
 
 function get_project_chart(project_id) {
   $.ajax({
-    url: 'http://127.0.0.1:5000/manager/chart/'+ project_id,
+    url: '/manager/chart/'+ project_id,
     type: 'GET',
     dataType: 'json',
     success: (back_data) => {
