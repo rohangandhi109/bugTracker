@@ -100,9 +100,13 @@
                                                         <td>{{ d.role }}</td>
                                                         {% if data.role=="admin" %}
                                                         <td>
-                                                            <a href="/remove-project-user?userid={{ d.id }}&projectid={{data.project.id}}" onclick="return confirm('Are you sure you want to delete this item?');">
+                                                            {% if d.delete_user %}
+                                                                <a href="/remove-project-user?userid={{ d.id }}&projectid={{data.project.id}}" onclick="return confirm('Are you sure you want to delete this item?');">
                                                                 Remove
-                                                            </a> 
+                                                                </a> 
+                                                            {% else %}
+                                                                Remove
+                                                            {% endif %}
                                                         </td>
                                                         {% endif %}
                                                     </tr>

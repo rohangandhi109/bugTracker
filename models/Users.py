@@ -31,6 +31,14 @@ class Users(db.Model):
 
         }
     
+    def short_format(self):
+        return{
+            'id' : self.id,
+            'email' : self.email,
+            'name' : self.name,
+            'role' : self.role,
+        }
+    
     def insert(self):
         db.session.add(self)
         db.session.commit()

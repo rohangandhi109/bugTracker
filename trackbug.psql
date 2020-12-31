@@ -464,6 +464,14 @@ COPY public.comment (c_id, t_id, users_id, date, comment) FROM stdin;
 58	20	11	21/12/2020	bob assigned to this ticket
 59	20	10	22/12/2020	status changed to in-progess
 60	20	10	25/12/2020	Status changed to closed
+61	21	19	6/7/2020	demo_dev assigned to this ticket
+62	21	20	8/8/2020	status changed to in-progess
+63	21	20	5/8/2020	Status changed to closed
+64	22	19	6/7/2020	demo_dev assigned to this ticket
+65	22	20	8/8/2020	status changed to in-progess
+67	23	19	6/8/2020	demo_dev assigned to this ticket
+70	24	19	6/8/2020	demo_dev assigned to this ticket
+73	25	19	6/9/2020	demo_dev assigned to this ticket
 \.
 
 
@@ -491,6 +499,15 @@ COPY public.map_users_proj (map_id, p_id, users_id, users_role, users_assign_dat
 20	4	5	user	27/12/2020	N/A
 21	2	5	user	27/12/2020	N/A
 18	2	3	user	27/12/2020	N/A
+25	5	19	manager	20/1/2020	N/A
+26	5	20	dev	20/1/2020	N/A
+28	5	22	user	30/12/2020	N/A
+29	5	23	dev	30/12/2020	N/A
+30	5	24	dev	30/12/2020	N/A
+31	5	18	user	30/12/2020	N/A
+36	1	19	manager	30/12/2020	N/A
+37	2	19	manager	30/12/2020	N/A
+38	3	19	manager	30/12/2020	N/A
 \.
 
 
@@ -531,20 +548,21 @@ COPY public.month_config (id, mth_id, mth_name, mth_year) FROM stdin;
 --
 
 COPY public.notification (n_id, t_id, users_id, type) FROM stdin;
-1	1	6	new
 2	1	8	new
 3	1	9	new
 4	1	2	new
 5	1	9	assigned
-6	1	6	update
 7	1	8	update
 8	1	9	update
 9	1	2	update
-10	1	6	update
 11	1	8	update
 12	1	9	update
 13	1	2	update
 14	2	9	assigned
+15	8	6	update
+16	8	13	update
+17	8	14	update
+18	8	4	update
 \.
 
 
@@ -557,6 +575,7 @@ COPY public.project (p_id, p_name, p_desc, p_start_date, p_end_date) FROM stdin;
 2	Bug Tracker	Use python-flask and postgreSql to implement bugTracker	1/1/2020	N/A
 3	Tapestry algorithm Simulator 	Routing algorithm for decentralized distributed systems for object location and routing	1/1/2020	N/A
 4	Data Deduplication on cloud storage	Use hash-table based File compression algorithm to deduplicate data	1/1/2020	N/A
+5	Demo_Project	Scrap project used to demonstrate the functionality of the bugTracker application	20/1/2020	N/A
 \.
 
 
@@ -571,7 +590,6 @@ COPY public.ticket (t_id, t_title, t_desc, users_id, submitter_email, p_id, t_pr
 5	numpy not compatible	Need to change the numpy version, not compatible	9	user1@gmail.com	1	Medium	closed	error	8/2/2020	30/5/2020
 6	Download from colab	code not woring on local machine	8	user1@gmail.com	1	Low	closed	error	8/2/2020	12/5/2020
 7	Accuracy very less	after adding new data accuracy decreased	8	user1@gmail.com	1	High	closed	fix	8/3/2020	12/5/2020
-8	star network wrong	Every distributed system not correctly attached	13	user3@gmail.com	3	Low	closed	error	9/4/2020	12/5/2020
 9	Data file corrupted	system 3 has wrong data file	13	user3@gmail.com	3	High	closed	error	9/4/2020	12/5/2020
 10	Routing not working	The routing table update function is wrong	13	user3@gmail.com	3	High	closed	error	9/4/2020	12/5/2020
 11	Router Table courrpted	The routing table update function is wrong	13	user3@gmail.com	3	Medium	closed	error	9/5/2020	12/6/2020
@@ -585,6 +603,12 @@ COPY public.ticket (t_id, t_title, t_desc, users_id, submitter_email, p_id, t_pr
 19	Admin create project error	admin endpoint failed to create new projects	10	user4@gmail.com	2	High	closed	bug	18/12/2020	20/12/2020
 20	Error while removing manager	Admin cant remove managers from project	10	user4@gmail.com	2	Medium	closed	bug	21/12/2020	25/12/2020
 2	Accuracy issuse	The accuracy for unseen data below 30	9	user1@gmail.com	1	Low	closed	error	8/1/2020	30/4/2020
+21	Time not correct	Exectuion time value is in seconds, convert to milliseconds	20	demo_user@gmail.com	5	High	closed	bug	2/7/2020	5/8/2020
+22	Download from colab	 code not woring on local machine	20	demo_user@gmail.com	5	Medium	in-progress	bug	2/7/2020	N/A
+23	Data file corrupted	system 3 has wrong data file	20	demo_user@gmail.com	5	Low	in-progress	bug	2/8/2020	N/A
+24	Runtime expensive	system 3 has wrong data file	20	demo_user@gmail.com	5	High	in-progress	bug	2/8/2020	N/A
+25	Runtime expensive	system 3 has wrong data file	20	demo_user@gmail.com	5	Low	in-progress	bug	2/9/2020	N/A
+8	Star network not working	Every distributed system not correctly attached	13	user3@gmail.com	3	Low	close	error	9/4/2020	12/5/2020
 \.
 
 
@@ -673,6 +697,19 @@ COPY public.ticket_history (id, t_id, users_id, t_status, t_update_date, priorit
 78	20	10	open	21/12/2020	Medium
 79	20	10	in-progress	22/12/2020	Medium
 80	20	10	closed	25/12/2020	Medium
+81	21	0	open	2/7/2020	High
+82	21	20	open	6/7/2020	High
+83	21	20	in-progress	8/8/2020	High
+84	21	20	closed	5/8/2020	High
+85	22	0	open	2/7/2020	Medium
+86	22	20	open	6/7/2020	Medium
+87	22	20	in-progress	8/8/2020	Medium
+89	23	0	open	2/8/2020	Low
+90	23	20	open	6/8/2020	Low
+93	24	0	open	2/8/2020	High
+94	24	20	open	6/8/2020	High
+97	25	0	open	2/9/2020	Low
+98	25	20	open	6/9/2020	Low
 \.
 
 
@@ -698,6 +735,13 @@ COPY public.users (users_id, users_email, users_name, users_password, users_role
 15	grace@gmail.com	grace	grace	dev	27/12/2020
 16	cole@gmail.com	cole	cole	dev	27/12/2020
 17	jane@gmail.com	jane	jane	dev	27/12/2020
+19	demo_manager@gmail.com	demo_manager	demo_manager	manager	20/1/2020
+21	demo_admin@gmail.com	demo_admin	demo_admin	admin	20/1/2020
+22	demo_user_1@gmail.com	demo_user_1	demo_user_1	user	30/12/2020
+23	demo_dev_1@gmail.com	demo_dev_1	demo_dev_1	dev	30/12/2020
+24	demo_dev_2@gmail.com	demo_dev_2	demo_dev_2	dev	30/12/2020
+18	demo_user@gmail.com	demo_user	demo_user	user	20/1/2020
+20	demo_dev@gmail.com	demo_dev	demo_dev	dev	20/1/2020
 \.
 
 
@@ -712,7 +756,7 @@ SELECT pg_catalog.setval('public.comment_c_id_seq', 4, true);
 -- Name: map_users_proj_map_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.map_users_proj_map_id_seq', 23, true);
+SELECT pg_catalog.setval('public.map_users_proj_map_id_seq', 38, true);
 
 
 --
@@ -726,7 +770,7 @@ SELECT pg_catalog.setval('public.month_config_id_seq', 1, false);
 -- Name: notification_n_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.notification_n_id_seq', 14, true);
+SELECT pg_catalog.setval('public.notification_n_id_seq', 18, true);
 
 
 --

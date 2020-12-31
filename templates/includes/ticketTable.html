@@ -22,8 +22,10 @@
                             {% endif %}
                         <th>Priority</th>
                         <th>Status</th>
-                        {% if data.role == 'dev' or data.role=='manager' %}
-                            <th>Developer</th>
+                        {% if data.page!='tickets' %}
+                            {% if data.role == 'dev' or data.role=='manager' %}
+                                <th>Developer</th>
+                            {% endif %}
                         {% endif %}
                         {% if data.page !='project_detail' %}
                             <th>Created date</th>
@@ -82,8 +84,10 @@
                         {% else %}
                             <td>{{ t.status }}</td>
                         {% endif %}
-                        {% if data.role == 'dev' or data.role=='manager' %}
-                            <td>{{ t.user_name }}</td>
+                        {% if data.page!='tickets' %}
+                            {% if data.role == 'dev' or data.role=='manager' %}
+                                <td>{{ t.user_name }}</td>
+                            {% endif %}
                         {% endif %}
                         {% if data.page !='project_detail' %}
                             <td>{{ t.create_date }}</td>

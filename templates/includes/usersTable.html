@@ -31,8 +31,12 @@
                         {% endif %}
                         {% if data.page=="userDetail" %}
                             <td>
-                                <a href="/user-form?edit=true&userid={{ users.id }}">edit</a> 
-                                <a href="/delete-user?userid={{ users.id }}">remove</a>
+                                <a href="/user-form?edit=true&userid={{ users.id }}">edit</a>
+                                {% if data.delete_user %}
+                                    <a href="/delete-user?userid={{ users.id }}">remove</a>
+                                {% else %}
+                                    remove
+                                {% endif %}
                             </td>
                         {% endif %}
                     </tr>

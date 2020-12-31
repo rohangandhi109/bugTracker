@@ -5,8 +5,8 @@
 
 import sys
 from datetime import date
-from flask import session, render_template,request,abort,redirect,url_for
-from sqlalchemy import func
+from flask import session, render_template,request,abort,redirect,url_for,jsonify
+from sqlalchemy import func,text
 
 from app import app,db
 from info import DATE
@@ -72,12 +72,20 @@ def get_project_details(project_id):
     # join Users, map_users_proj on user_id
     # join map_users_proj, Project on project_id
     # join is used to map the users to project table using the mapping table map_users_proj
-
     user = Users.query.join(Map_users_proj, Map_users_proj.users_id == Users.users_id)\
-        .join(Project, Project.p_id == Map_users_proj.p_id)\
-            .add_columns(Users.users_id.label('id'),Users.users_name.label('name'),Users.users_email.label('email'),Map_users_proj.users_role.label('role'))\
-        .filter(Project.p_id == project_id).all()
+                .join(Project, Project.p_id == Map_users_proj.p_id)\
+                .add_columns(Users.users_id.label('id'),Users.users_name.label('name'),\
+                    Users.users_email.label('email'),Map_users_proj.users_role.label('role'))\
+                .filter(Project.p_id == project_id).all()
+    user = [Users.short_format(u) for u in user]
     
+    for u in user:
+        delete_user = False
+        if u['id'] > 21 or userInfo['id']== 1:
+            delete_user = True    
+        u['delete_user'] = delete_user
+           
+        
     # Fetch the project records with primary key project_id
     project = Project.query.get(project_id)
 
@@ -86,8 +94,15 @@ def get_project_details(project_id):
     # this is used to add users to project/change role of specific user
     all_users=""
     if userInfo['role']=="admin":
-        all_users = Users.query.all()
-        all_users = [all.format() for all in all_users]
+        # all_users = Users.query.filter(Users.users_role!='admin').all()
+        # all_users = [all.format() for all in all_users]
+        
+        sql = text("""select users_id , users_name ,users_email
+                    ,users_password,users_role,update_date from users 
+                    where users_role!='admin' and users_id not in 
+                    (select users_id from map_users_proj where p_id ="""+str(project_id)+""")""")
+        all_users = db.session.execute(sql)
+        all_users = [Users.format(all) for all in all_users]
 
     data = {
         'users': user,

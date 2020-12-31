@@ -93,6 +93,19 @@ def error_404(error):
     }
     return render_template('error.html',data=data)
 
+@app.errorhandler(422)
+def error_404(error):
+    userInfo = session.get('userProfile', 'not set')
+    data = {
+        'user_name': userInfo['name'],
+        'role': userInfo['role'],
+        'page' : 'error',
+        'error' : '422',
+        'message': error,
+        'notify': notification.notify(userInfo['id']),
+    }
+    return render_template('error.html',data=data)
+
 @app.errorhandler(500)
 def error_500(error):
     userInfo = session.get('userProfile', 'not set')
@@ -114,6 +127,19 @@ def error_401(error):
         'role': userInfo['role'],
         'page' : 'error',
         'error' : '401',
+        'message': error,
+        'notify': notification.notify(userInfo['id']),
+    }
+    return render_template('error.html',data=data)
+
+@app.errorhandler(403)
+def error_403(error):
+    userInfo = session.get('userProfile', 'not set')
+    data = {
+        'user_name': userInfo['name'],
+        'role': userInfo['role'],
+        'page' : 'error',
+        'error' : '403',
         'message': error,
         'notify': notification.notify(userInfo['id']),
     }

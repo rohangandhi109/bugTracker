@@ -135,8 +135,9 @@ function get_project_chart(project_id) {
       var color3 = 28
       var datasets = [];
       var month_name = [];
-      var increment = 255/back_data.totalProjects - 40 
+      var increment = 255/back_data.totalProjects 
       var j = 0;
+      var array_color = ["#b2b266","#4e73df","#ff6666","#d2ff4d","#ffbb33","#adad85"]
       for (i = 0; i < back_data.totalProjects; i++) { 
         var datalabels = []
         for (j = j; j < (12 + ( 12 * i))  ; j++) {
@@ -148,7 +149,7 @@ function get_project_chart(project_id) {
         color2 += (i * increment)
         color3 += (i * increment)
         color_light = "rgba(" + color1 + "," + color2 + "," + color3 + ", 0)";
-        color_dark = "rgba(" + color1 + "," + color2 + "," + color3 + ", 1)";
+        color_dark = array_color[i]
         var some = {
           label: back_data.chart_data[j-1].name,
           lineTension: 0.3,

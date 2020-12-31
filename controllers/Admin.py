@@ -87,8 +87,10 @@ def get_user_history(Id):
             .filter(Map_users_proj.users_id==Id)
 
     # Get all the projects
-    all_project = Project.query.all()
-    all_project = [p.format() for p in all_project]
+    sql = text("""select p_id,p_name,p_desc,p_start_date, p_end_date from project where p_id
+                 not in (select p_id from map_users_proj where users_id ="""+str(Id)+""")""")
+    all_project = db.session.execute(sql)
+    all_project = [Project.format(p) for p in all_project]
 
     # Get the tickets of the user/dev/manager
     ticket = ""
@@ -97,17 +99,23 @@ def get_user_history(Id):
         ticket = Ticket.query.join(Project, Ticket.p_id==Project.p_id)\
             .add_columns(Ticket.t_id.label('id'), Ticket.t_title.label('title'), Project.p_name.label('project'))\
                 .filter(Ticket.submitter_email==user['email'])
+
     #Developer Assigned tickets
     elif user['role']=='dev':
         ticket = Ticket.query.join(Project, Ticket.p_id==Project.p_id)\
-            .add_columns(Ticket.t_id.label('id'), Ticket.t_title.label('title'), Project.p_name.label('project'))\
-            .filter(Ticket.users_id==Id)
+                    .add_columns(Ticket.t_id.label('id'), Ticket.t_title.label('title'), Project.p_name.label('project'))\
+                    .filter(Ticket.users_id==Id)
+
+    delete_user = False
+    if Id > 21 or userInfo['id'] == 1:
+        delete_user = True
 
     data = {
         'users' : [user],
         'projects': project,
         'all_projects': all_project,
         'ticket': ticket,
+        'delete_user': delete_user,
         'user_name': userInfo['name'],
         'role': userInfo['role'],
         'page' : 'userDetail'
@@ -120,14 +128,17 @@ def delete_user():
     if userInfo['role'] !='admin':
         abort(401)
     userid = request.args.get('userid','')
-    user = Users.query.get(userid)
-    try:
-        user.delete()
-    except:
-        print(sys.exc_info())
-        abort(500)
-    
-    return redirect(url_for('get_all_users'))
+    if int(userid) > 21 or userInfo['id']==1:
+        user = Users.query.get(userid)
+        try:
+            user.delete()
+        except:
+            print(sys.exc_info())
+            abort(500)
+        
+        return redirect(url_for('get_all_users'))
+    else:
+        abort(403)
 
 @app.route('/edit-user',methods=['POST'])
 def edit_user():
@@ -138,7 +149,6 @@ def edit_user():
     user_update = Users.query.get(id)
 
     user_update.users_name = request.form.get('name', '')
-    user_update.users_email = request.form.get('email', '')
     user_update.users_role = request.form.get('role', '')
     user_update.update()
 
@@ -154,8 +164,15 @@ def assign_project():
     role = request.form.get('role')
     assign_date = DATE
     action_type = request.form.get('type')
-
-    if action_type=='Assign':
+    check_map=''
+    
+    if action_type=='Assign':    
+        check_map = Map_users_proj.query\
+                .filter(Map_users_proj.p_id==project_id)\
+                .filter(Map_users_proj.users_id==user_id)\
+                .all()
+        if check_map :
+            abort(422)
         map = Map_users_proj(project_id,user_id,role,assign_date,'N/A')
         try:
             map.insert()
@@ -190,23 +207,9 @@ def get_all_projects():
     userInfo = session.get('userProfile', 'not set')
     if userInfo['role'] !='admin':
         abort(401)
-    
-    sql=text(""" SELECT proj.p_id         AS p_id, 
-                                    proj.p_name       AS p_name, 
-                                    proj.p_desc       AS p_desc, 
-                                    proj.p_start_date AS p_start_date, 
-                                    man.users_name     AS p_end_date 
-                                FROM   project proj 
-                                    LEFT OUTER JOIN (SELECT map.p_id, 
-                                                            u.users_name 
-                                                        FROM   map_users_proj map 
-                                                            INNER JOIN users u 
-                                                                    ON map.users_id = u.users_id 
-                                                        WHERE  map.users_role = 'manager')man 
-                                                    ON proj.p_id = man.p_id """)
-                                                
-    project = db.session.execute(sql)
-    project = [Project.format(p) for p in project]
+                                    
+    project = Project.query.all()
+    project = [p.format() for p in project]
     data={
         'project' : project,
         'user_name': userInfo['name'],
@@ -223,18 +226,19 @@ def remove_from_project():
     user_id = request.args.get('userid')
     project_id = request.args.get('projectid')
     map = Map_users_proj.query.filter(Map_users_proj.p_id==project_id).filter(Map_users_proj.users_id==user_id).one()
-    
-    try:
-        map.delete()
-    except:
-        print(sys.exc_info())
-        abort(500)
-    data = {
-        'user_id':user_id,
-        'project_id':project_id
-    }
-    return data
-
+    if int(user_id) > 21 or userInfo['id']==1:
+        try:
+            map.delete()
+        except:
+            print(sys.exc_info())
+            abort(500)
+        data = {
+            'user_id':user_id,
+            'project_id':project_id
+        }
+        return data
+    else:
+        abort(403)
 @app.route('/admin/tickets')
 def get_all_tickets():
     userInfo = session.get('userProfile', 'not set')

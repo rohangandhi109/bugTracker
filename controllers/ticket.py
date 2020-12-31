@@ -39,9 +39,9 @@ def get_ticketForm():
     if edit == 'true':
         ticket = Ticket.query.get(request.args.get('ticketid'))
 
-    project  = Project.query.join(Map_users_proj, Map_users_proj.p_id==Project.p_id).\
+    project  = Project.query.\
                 add_columns(Project.p_id.label('id'), Project.p_name.label('name')).\
-                filter(Map_users_proj.users_id==userInfo['id']).all()
+                all()
 
     data = {
         'edit':edit,
@@ -121,7 +121,7 @@ def create_ticket():
                 if new_id[0][0] == None:
                     new_id[0][0]=0
 
-                ticket_history = Ticket_history(new_id[0][0],ticketid,ticket.users_id,t_status,t_date,t_priority)
+                ticket_history = Ticket_history(new_id[0][0]+1,ticketid,ticket.users_id,t_status,t_date,t_priority)
                 try:
                     ticket_history.insert()
                 except:

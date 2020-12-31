@@ -29,7 +29,7 @@
                         <div class="item">
                             <label for="email">Email</label>
                             {% if data.edit == "true" %}
-                                <input id="email" type="text" name="email" value="{{ data.user.email }}" />
+                                <label>{{ data.user.email }}</label> 
                                 <input id="id" type="hidden" name="id" value="{{ data.user.id }}"  />
                             {% else %}
                                 <input id="email" type="text" name="email" />

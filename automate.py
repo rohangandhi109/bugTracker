@@ -3,20 +3,21 @@ from datetime import date
 # INSERT TICKET 
 # print(date.today().strftime('%d/%m/%Y'))
 
-t_id = 20
-title = 'Error while removing manager'
-desc = 'Admin cant remove managers from project'
-user_create = 'user4'
-user_assigned = 'bob'
-d1='21/12/2020'
-d2='21/12/2020'
-d3='22/12/2020'
-d4='25/12/2020'
-p_id = 2
-user_id = ['11','10','10']
+t_id = 25
+
+title = 'Runtime expensive'
+desc = 'system 3 has wrong data file'
+user_create = 'demo_user'
+user_assigned = 'demo_dev'
+d1='2/9/2020'
+d2='6/9/2020'
+d3='8/9/2020'
+d4='5/10/2020'
+p_id = 5
+user_id = ['19','20','20']
 
 submitter= user_create+'@gmail.com'
-status= 'closed'
+status= 'open'
 arr_p = ["High","Low","Medium"]
 priority= arr_p[random.randint(0,2)]
 type = 'bug'

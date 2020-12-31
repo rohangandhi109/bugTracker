@@ -24,12 +24,25 @@
                     {% if data.error == '401' %}
                         <h1> Unauthorized </h1>
                         <b> {{data.message}} </b>
+                    
                     {% elif data.error == '500' %}
                         <h1>Server side error</h1>
                         <b>{{data.message}}</b>
+                    
                     {% elif data.error == '404' %}
                         <h1>Page not found</h1>
                         <b>{{data.message}}</b>
+                    
+                    {% elif data.error == '403' %}
+                        <h1>Forbidden</h1>
+                        <b>{{data.message}}</b>
+                        <br>
+                        <b>UserIds: <I>1 to 21</I> have only read-only access </b>
+
+                    {% elif data.error == '422' %}
+                        <h1>Already Present</h1>
+                        <b>{{data.message}}</b>
+                    
                     {% endif %}
                 </div>
                 <!-- /.container-fluid -->

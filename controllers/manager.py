@@ -293,9 +293,10 @@ def get_manager_tickets():
             .join(Project, Project.p_id==Map_users_proj.p_id)\
             .add_columns(Ticket.t_id.label('id'), Ticket.t_title.label('title'), Ticket.t_desc.label('desc'),\
                 Project.p_name.label('p_id'), Ticket.t_priority.label('priority'),\
-                Ticket.t_status.label('status'), Users.users_name.label('users_id'),\
+                Ticket.t_status.label('status'), Users.users_name.label('user_name'),\
                 Ticket.t_create_date.label('create_date'),Ticket.t_close_date.label('close_date'))\
             .filter(Users.users_email==manager_email)
+
     
     data={
         'ticket' : ticket,
