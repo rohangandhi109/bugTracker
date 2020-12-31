@@ -36,8 +36,8 @@ function change_project() {
 }
 
 $(document).ready(function () {
-  get_project_chart(0)
   set_card(0)
+  get_project_chart(0)
   get_project_pie(0)
 });
 
