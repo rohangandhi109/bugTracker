@@ -135,7 +135,7 @@ function get_project_chart(project_id) {
       var arr_dates = [0,12,24,36,48,60,72,84,96,108,120]
       var j = 0;
       var array_color = ["#b2b266", "#4e73df", "#ff6666", "#d2ff4d", "#ffbb33", "#adad85"];
-      for (i = 0; i < back_data.totalProjects; i++) { 
+      for (var i = 0; i < back_data.totalProjects; i++) { 
         var datalabels = []
         for (j = arr_dates[i]; j < arr_dates[i+1]  ; j++) {
           datalabels.push(back_data.chart_data[j].cnt)
