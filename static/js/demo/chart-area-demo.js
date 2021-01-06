@@ -139,14 +139,14 @@ function get_project_chart(project_id) {
       for (var i = 0; i < back_data.totalProjects; i++) { 
         var datalabels = []
         for (j in arr_dates) {
-          datalabels.push(back_data.chart_data[j+i].cnt)
+          datalabels.push(back_data.chart_data[arr_dates[j]+i].cnt)
           if(i==0)
-            month_name.push(back_data.chart_data[j+i].month)
-          console.log(j +": "+ back_data.chart_data[j+i].month)
+            month_name.push(back_data.chart_data[arr_dates[j]+i].month)
+          console.log(j +": "+ back_data.chart_data[arr_dates[j]+i].month)
         }
         color_dark = array_color[i]
         var some = {
-          label: back_data.chart_data[j+i-1].name,
+          label: back_data.chart_data[arr_dates[j] +i -1].name,
           lineTension: 0.3,
           borderColor: color_dark,
           pointRadius: 3,
