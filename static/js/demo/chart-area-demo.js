@@ -141,6 +141,7 @@ function get_project_chart(project_id) {
           datalabels.push(back_data.chart_data[j].cnt)
           if(i==0)
             month_name.push(back_data.chart_data[j].month)
+          console.log(j +": "+ back_data.chart_data[j].month)
         }
         color_dark = array_color[i]
         var some = {
