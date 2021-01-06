@@ -10,7 +10,7 @@ from info import *
 app = Flask(__name__)
 app.secret_key = "something"
 # app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
-app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+app.config['SQLALCHEMY_DATABASE_URI'] = env.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -26,11 +26,11 @@ def after_request(response):
 
 auth0 = oauth.register(
     'auth0',
-    client_id = AUTH0_CLIENT_ID,
-    client_secret = AUTH0_CLIENT_SECRET,
-    api_base_url = AUTH0_BASE_URL,
-    access_token_url =AUTH0_BASE_URL + '/oauth/token',
-    authorize_url = AUTH0_BASE_URL + '/authorize',
+    client_id = env.get('AUTH0_CLIENT_ID'),
+    client_secret = env.get('AUTH0_CLIENT_SECRET'),
+    api_base_url = env.get('AUTH0_BASE_URL'),
+    access_token_url =env.get('AUTH0_BASE_URL') + '/oauth/token',
+    authorize_url = env.get('AUTH0_BASE_URL') + '/authorize',
     client_kwargs={
         'scope': 'openid profile email',
     },
@@ -49,7 +49,7 @@ from controllers import userController, developer,ticket,comment,project,Admin,m
 
 @app.route('/')
 def login():
-    return auth0.authorize_redirect(redirect_uri=AUTH0_CALLBACK_URL, audience=AUTH0_AUDIENCE)
+    return auth0.authorize_redirect(redirect_uri=env.get('AUTH0_CALLBACK_URL'), audience=env.get('AUTH0_AUDIENCE'))
 
 @app.route('/callback')
 def callback_handling():
@@ -77,7 +77,7 @@ def temp():
 @app.route('/logout')
 def logout():
     session.clear()
-    params = {'returnTo': url_for('login', _external=True), 'client_id': AUTH0_CLIENT_ID}
+    params = {'returnTo': url_for('login', _external=True), 'client_id': env.get('AUTH0_CLIENT_ID')}
     return redirect(auth0.api_base_url + '/v2/logout?' + urlencode(params))
 
 
