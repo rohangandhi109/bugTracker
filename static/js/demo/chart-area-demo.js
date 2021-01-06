@@ -132,34 +132,42 @@ function get_project_chart(project_id) {
     success: (back_data) => {
       var datasets = [];
       var month_name = [];
-      var arr_dates = [0,4,8,16,20,24,28,32,36,40,44]
-      var j = 0;
+      var month_count = 0;
       var array_color = ["#b2b266", "#4e73df", "#ff6666", "#d2ff4d", "#ffbb33", "#adad85"];
-      console.log(back_data)
-      for (var i = 0; i < back_data.totalProjects; i++) { 
+      for (var proj_count = 0; proj_count < back_data.totalProjects; proj_count++){
         var datalabels = []
-        for (j in arr_dates) {
-          datalabels.push(back_data.chart_data[arr_dates[j]+i].cnt)
-          if(i==0)
-            month_name.push(back_data.chart_data[arr_dates[j]+i].month)
-          console.log(j +": "+ back_data.chart_data[arr_dates[j]+i].month)
+        for (var i = 0; i < back_data.chart_data.length; i++) {
+          if (back_data.chart_data[i].p_id == back_data.project[proj_count].p_id) {
+            datalabels.push(back_data.chart_data[i].cnt)
+            if (proj_count == 0) {
+              month_name.push(back_data.chart_data[i].month)
+            }
+            color_dark = array_color[proj_count]
+            month_count++;
+            var some = {
+              label: back_data.chart_data[i].name,
+              lineTension: 0.3,
+              borderColor: color_dark,
+              pointRadius: 3,
+              pointBackgroundColor: color_dark,
+              pointBorderColor: color_dark,
+              pointHoverRadius: 3,
+              pointHoverBackgroundColor: color_dark,
+              pointHoverBorderColor: color_dark,
+              pointHitRadius: 10,
+              pointBorderWidth: 2,
+              data: datalabels
+            }
+          }
+          if (month_count == 12) {
+            datasets.push(some)
+            console.log(i)
+            console.log(back_data.chart_data[i])
+            console.log(some.label)
+            month_count = 0
+          }
+          
         }
-        color_dark = array_color[i]
-        var some = {
-          label: back_data.chart_data[arr_dates[j] +i -1].name,
-          lineTension: 0.3,
-          borderColor: color_dark,
-          pointRadius: 3,
-          pointBackgroundColor: color_dark,
-          pointBorderColor: color_dark,
-          pointHoverRadius: 3,
-          pointHoverBackgroundColor: color_dark,
-          pointHoverBorderColor: color_dark,
-          pointHitRadius: 10,
-          pointBorderWidth: 2,
-          data: datalabels
-        }
-        datasets.push(some)
       }
       $('#myAreaChart').remove();
       $('#chart-area').append('<canvas id="myAreaChart"><canvas>');

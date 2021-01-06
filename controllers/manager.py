@@ -177,9 +177,16 @@ def get_bar_chart(project_id):
 
         chart_data = db.session.execute(sql)
         chart_data =  [MonthConfig.format(row) for row in chart_data]
+        project = Project.query.join(Map_users_proj, Map_users_proj.p_id==Project.p_id)\
+                    .add_columns(Project.p_id.label('p_id'))\
+                    .filter(Map_users_proj.users_id==userInfo['id']).all()
+        
+        project = [Project.getID(p) for p in project]
+
         back_chart_data ={
             'chart_data': chart_data,
             'totalProjects': math.trunc(len(chart_data)/12),
+            'project': project
         }  
         return back_chart_data
     else:
@@ -212,10 +219,13 @@ def get_bar_chart(project_id):
                                                 AND mapid.p_id = filter.p_id
                                                 INNER JOIN project proj on mapid.p_id = proj.p_id;   """)
         chart_data = db.session.execute(sql)
-        chart_data =  [MonthConfig.format(row) for row in chart_data]   
+        chart_data =  [MonthConfig.format(row) for row in chart_data]
+        project = Project.query.add_columns(Project.p_id.label('p_id')).filter(Project.p_id==project_id).all()
+        project = [Project.getID(p) for p in project]
         back_chart_data ={
             'chart_data': chart_data,
-            'totalProjects': math.trunc(len(chart_data)/12)
+            'totalProjects': math.trunc(len(chart_data)/12),
+            'project': project
         }   
         return back_chart_data
 

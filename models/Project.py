@@ -33,6 +33,12 @@ class Project(db.Model):
             'p_name': self.p_name
         }
     
+    def getID(self):
+        return {
+            'p_id':self.p_id
+        }
+
+
     def insert(self):
         db.session.add(self)
         db.session.commit()
