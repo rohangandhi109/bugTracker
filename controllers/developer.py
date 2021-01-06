@@ -56,7 +56,8 @@ def get_project_tickets():
         'role': userInfo['role'],
         'page' : 'tickets',
         'notify': notification.notify(userInfo['id']),
-        'tickets_type' : 'all'
+        'tickets_type' : 'all',
+        'nav_bar':'alltickets'
     }
     return render_template('list.html',data=data)
 
@@ -89,7 +90,8 @@ def get_project_assigned_tickets():
         'role': userInfo['role'],
         'page' : 'tickets',
         'notify': notification.notify(userInfo['id']),
-        'tickets_type' : 'assigned'
+        'tickets_type' : 'assigned',
+        'nav_bar':'assignedtickets'
     }
     return render_template('list.html',data=data)
 
@@ -115,15 +117,15 @@ def get_project_submitted_tickets():
                     Ticket.t_title.label('title'),Ticket.t_desc.label('desc'),Ticket.t_priority.label('priority'),\
                     Ticket.t_type.label('type'),Ticket.t_status.label('status'),Ticket.t_create_date.label('create_date'),\
                     Ticket.t_close_date.label('close_date'),Project.p_name.label('p_id'))\
-    
-
+                .filter(Ticket.submitter_email==user_email)
     data={
         'ticket' : ticket,
         'user_name': userInfo['name'],
         'role': userInfo['role'],
         'page' : 'tickets',
         'notify': notification.notify(userInfo['id']),
-        'tickets_type' : 'submitted'
+        'tickets_type' : 'submitted',
+        'nav_bar':'submittedtickets'
     }
     return render_template('list.html', data=data)
 

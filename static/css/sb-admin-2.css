@@ -4374,6 +4374,36 @@ input[type="button"].btn-block {
   color: rgba(0, 0, 0, 0.3);
 }
 
+.navbar-tick {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.navbar-li {
+  float: left;
+}
+
+.navbar-a {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.navbar-select{
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  color: #c0c0c0;
+}
+
+.navbar-a :hover{
+  color: 	#00FFFF;
+  text-decoration: none;
+}
+
+
 .navbar-light .navbar-nav .show > .nav-link,
 .navbar-light .navbar-nav .active > .nav-link,
 .navbar-light .navbar-nav .nav-link.show,

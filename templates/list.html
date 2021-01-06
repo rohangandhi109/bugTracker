@@ -44,27 +44,66 @@
                             <a href="/ticket-form?edit=false" class="btn btn-info btn-icon-split">
                                 <span class="text">Create Ticket</span>
                             </a>
+                            <hr>
                         {% endif %}
                         {% if data.role == "dev" %}
-                            <a href="/dev/tickets" class="btn btn-info btn-icon-split">
-                                <span class="text">All Ticket</span>
-                            </a>
-                            <a href="/dev/assigned-tickets" class="btn btn-info btn-icon-split">
-                                <span class="text">Assigned Ticket</span>
-                            </a>
-                            <a href="/dev/my-tickets" class="btn btn-info btn-icon-split">
-                                <span class="text">Submitted Ticket</span>
-                            </a>
+                            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                                <ul class="navbar-tick">
+                                    <li class="navbar-li dropdown no-arrow mx-1">
+                                        {% if data.nav_bar=="alltickets" %}
+                                            <a class="navbar-select" href="/dev/tickets">
+                                        {% else %}
+                                            <a class="navbar-a" href="/dev/tickets">
+                                        {% endif %}
+                                            <span class="text">All Ticket</span>
+                                        </a>
+                                    </li>
+                                    <li class="navbar-li dropdown no-arrow mx-1">
+                                        {% if data.nav_bar=="assignedtickets" %}
+                                            <a class="navbar-select" href="/dev/assigned-tickets"></a>
+                                        {% else %}
+                                            <a class="navbar-a" href="/dev/assigned-tickets">
+                                        {% endif %}
+                                            <span class="text">Assigned Ticket</span>
+                                        </a>
+                                    </li>
+                                    <li class="navbar-li dropdown no-arrow mx-1">
+                                        {% if data.nav_bar=="submittedtickets" %}
+                                            <a class="navbar-select" href="/dev/my-tickets">
+                                        {% else %}
+                                        <a class="navbar-a" href="/dev/my-tickets">
+                                        {% endif %}
+                                            <span class="text">Submitted Ticket</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </nav>
                         {% endif %}
                         {% if data.role=="manager" %}
-                            <a href="/manager/tickets" class="btn btn-info btn-icon-split">
-                                <span class="text">All Ticket</span>
-                            </a>
-                            <a href="/manager/my-tickets" class="btn btn-info btn-icon-split">
-                                <span class="text">Submitted Ticket</span>
-                            </a>
+                        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                            <ul class="navbar-tick">
+                                <li class="navbar-li dropdown no-arrow mx-1">
+                                    {% if data.nav_bar=="alltickets" %}
+                                        <a class="navbar-select" href="/manager/tickets">
+                                    {% else %}
+                                        <a class="navbar-a" href="/manager/tickets">
+                                    {% endif %}
+                                            <span class="text">All Ticket</span>
+                                        </a>
+                                </li>
+                                <li class="navbar-li dropdown no-arrow mx-1">
+                                    {% if data.nav_bar=="submittedtickets" %}
+                                        <a class="navbar-select"  href="/manager/my-tickets">
+                                    {% else %}
+                                        <a class="navbar-a"  href="/manager/my-tickets">
+                                    {% endif %}
+                                            <span class="text">Submitted Ticket</span>
+                                        </a>
+                                </li>
+                            </ul>
+                        </nav>
                         {% endif %}
-                        <hr>
+                        
                         <div>
                             {% include '/includes/ticketTable.html' %}
                         </div>

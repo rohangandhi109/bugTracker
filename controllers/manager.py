@@ -304,7 +304,8 @@ def get_manager_tickets():
         'role': userInfo['role'],
         'page' : 'tickets',
         'notify': notification.notify(userInfo['id']),
-        'tickets_type' : 'all'
+        'tickets_type' : 'all',
+        'nav_bar' : 'alltickets'
     }
     
     return render_template('list.html',data=data)
@@ -322,7 +323,7 @@ def get_manager_submitted_tickets():
             .add_columns(Ticket.t_id,Ticket.users_id,Ticket.submitter_email,\
             Ticket.t_title,Ticket.t_desc,Ticket.t_priority,Ticket.t_type,\
             Ticket.t_status,Ticket.t_create_date,Ticket.t_close_date,Project.p_name.label('p_id'))\
-            .filter(Ticket.submitter_email==user_email).order_by(Ticket.t_id.asc()).all()
+            .filter(Ticket.submitter_email==user_email).all()
     ticket = [Ticket.format(tick) for tick in ticket]
 
 
@@ -332,7 +333,8 @@ def get_manager_submitted_tickets():
         'role': userInfo['role'],
         'page' : 'tickets',
         'notify': notification.notify(userInfo['id']),
-        'tickets_type' : 'submitted'
+        'tickets_type' : 'submitted',
+        'nav_bar' : 'submittedtickets'
     }
     return render_template('list.html', data=data)
 
