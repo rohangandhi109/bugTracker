@@ -1,11 +1,4 @@
-<br />
-<p align="center">
-    <a href="https://bugtracker-stage.herokuapp.com/">
-        <img src="static/img/Bugtrac_logo.png" width="200" height="80">
-    </a>
-</p>
-
-### Project Description
+## Project Description
 This project is a web application to track bugs with user assignment, role management and notification features.
 The project has 4 roles
 1. System Admin - CRUD access Users, Projects, Tickets
