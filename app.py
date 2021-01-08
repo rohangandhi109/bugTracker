@@ -16,6 +16,8 @@ db = SQLAlchemy(app)
 
 oauth = OAuth(app)
 
+AUTH0_BASE_URL='https://'+ env.get('AUTH0_DOMAIN')
+
 @app.after_request
 def after_request(response):
     response.headers.add('Access-Control-Allow-Headers',
@@ -28,9 +30,9 @@ auth0 = oauth.register(
     'auth0',
     client_id = env.get('AUTH0_CLIENT_ID'),
     client_secret = env.get('AUTH0_CLIENT_SECRET'),
-    api_base_url = env.get('AUTH0_BASE_URL'),
-    access_token_url =env.get('AUTH0_BASE_URL') + '/oauth/token',
-    authorize_url = env.get('AUTH0_BASE_URL') + '/authorize',
+    api_base_url = AUTH0_BASE_URL,
+    access_token_url =AUTH0_BASE_URL + '/oauth/token',
+    authorize_url = AUTH0_BASE_URL + '/authorize',
     client_kwargs={
         'scope': 'openid profile email',
     },
