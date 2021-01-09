@@ -88,37 +88,6 @@ flask run --reload
 
 https://bugtracker109-stage.herokuapp.com/
 
-### Login information
-
-#### 1. System Admin
-
-```
-Username: demo_admin@gmail.com
-Password: demo_admin
-```
-
-#### 2. Project Manager
-
-```
-Username: demo_manager@gmail.com
-Password: demo_manager
-```
-
-#### 3. Project Developer
-
-```
-Username: demo_dev@gmail.com
-Password: demo_dev
-```
-
-#### 4. Project User
-
-```
-Username: demo_user@gmail.com
-Password: demo_user
-```
-
-
 
 
 
