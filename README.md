@@ -36,40 +36,22 @@ psql trackbug < trackbug.psql
 ### Setting the environment variables
 
 1. Postgres sql database URL
-
-```
-export DATABASE_URL=postgresql://<USERNAME>:<PASSWORD>@<HOST>:<PORT>/<DATABASE_NAME>
-```
+``` export DATABASE_URL=postgresql://<USERNAME>:<PASSWORD>@<HOST>:<PORT>/<DATABASE_NAME> ```
 
 2. Auth0 Domain name
-
-```
-export AUTH0_DOMAIN=<YOUR_DOMAIN_NAME>
-```
+```export AUTH0_DOMAIN=<YOUR_DOMAIN_NAME>```
 
 3. Auth0 API Audience
-
-```
-export AUTH0_AUDIENCE=<YOUR_API_AUDIENC>
-```
+```export AUTH0_AUDIENCE=<YOUR_API_AUDIENC>```
 
 4. Auth0 client ID
-
-```
-export AUTH0_CLIENT_ID=<YOUR_CLIENT_ID>
-```
+```export AUTH0_CLIENT_ID=<YOUR_CLIENT_ID>```
 
 5. Auth0 client Secret
-
-```
-export AUTH0_CLIENT_SECRET=<YOUR_CLIENT_SECRET>
-```
+```export AUTH0_CLIENT_SECRET=<YOUR_CLIENT_SECRET>```
 
 6. Auth0 callback URL
-
-```
-AUTH0_CALLBACK_URL=<CALLBACK_URL>
-```
+```AUTH0_CALLBACK_URL=<CALLBACK_URL>```
 
 
 ## Running the web application
