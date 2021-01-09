@@ -72,10 +72,6 @@ def callback_handling():
         return redirect('/'+ users['role']+ '/dashboard')
     return redirect('/'+ users['role']+ '/tickets')
 
-@app.route('/card')
-def temp():
-    return render_template('charts.html')
-
 @app.route('/logout')
 def logout():
     session.clear()
